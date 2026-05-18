@@ -102,6 +102,12 @@ pub fn project_site_at_coordinates(ctx: &ReducerContext, coordinates: &SmallHexT
     None
 }
 
+pub fn placeable_at_coordinates(ctx: &ReducerContext, coordinates: &SmallHexTile) -> Option<PlaceableState> {
+    LocationState::select_all(ctx, coordinates)
+        .filter_map(|location| ctx.db.placeable_state().entity_id().find(&location.entity_id))
+        .next()
+}
+
 pub fn deployables_at_coordinates<'a>(ctx: &'a ReducerContext, coordinates: SmallHexTile) -> impl Iterator<Item = DeployableState> + 'a {
     MobileEntityState::select_all(ctx, coordinates).filter_map(|x| ctx.db.deployable_state().entity_id().find(x.entity_id))
 }
@@ -257,6 +263,20 @@ pub fn project_sites_in_radius(ctx: &ReducerContext, coord: SmallHexTile, radius
         })
         .collect();
     sites
+}
+
+pub fn placeables_in_radius(ctx: &ReducerContext, coord: SmallHexTile, radius: i32) -> Vec<PlaceableState> {
+    ctx.db
+        .placeable_state()
+        .iter()
+        .filter(|placeable| {
+            if let Some(loc) = ctx.db.location_state().entity_id().find(&placeable.entity_id) {
+                loc.coordinates().distance_to(coord) <= radius
+            } else {
+                false
+            }
+        })
+        .collect()
 }
 
 pub fn get_location_for_entity(ctx: &ReducerContext, entity_id: u64) -> Option<SmallHexTile> {

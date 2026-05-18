@@ -49,6 +49,7 @@ pub mod paved_tile_state;
 pub mod paving_tile_desc;
 pub mod permission;
 pub mod permission_state;
+pub mod placeable_state;
 pub mod pillar_shaping_state;
 pub mod player_action_state;
 pub mod player_action_type;

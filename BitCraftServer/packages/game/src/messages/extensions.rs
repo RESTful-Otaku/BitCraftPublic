@@ -182,6 +182,19 @@ impl ResourcePlacementRecipeDesc {
     }
 }
 
+impl PlaceableInteractionDesc {
+    pub fn get_skill_type(&self) -> Option<SkillType> {
+        let skill_id = match self.experience_per_progress.first() {
+            Some(exp) => exp.skill_id,
+            None => 0,
+        };
+        if skill_id > SkillType::ANY as i32 {
+            return Some(SkillType::to_enum(skill_id));
+        }
+        return None;
+    }
+}
+
 impl EmpireNotificationType {
     pub fn from_i32(value: i32) -> EmpireNotificationType {
         match value {

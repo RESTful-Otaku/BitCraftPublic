@@ -4080,6 +4080,137 @@ fn import_quest_drop_desc_internal(ctx: &ReducerContext, records: Vec<QuestDropD
     Ok(())
 }
 
+#[spacetimedb::reducer]
+pub fn import_placeable_desc(ctx: &ReducerContext, records: Vec<PlaceableDesc>) -> Result<(), String> {
+    if !has_role(ctx, &ctx.sender, Role::Admin) {
+        return Err("Invalid permissions".into());
+    }
+    import_placeable_desc_internal(ctx, records)?;
+    Ok(())
+}
+fn import_placeable_desc_internal(ctx: &ReducerContext, records: Vec<PlaceableDesc>) -> Result<(), String> {
+    for id in ctx.db.placeable_desc().iter().map(|item| item.id) {
+        ctx.db.placeable_desc().id().delete(&id);
+    }
+    let len: usize = records.len();
+    log::info!("Will insert {} records of type PlaceableDesc", len);
+    for record in records {
+        let id = record.id;
+        if let Err(err) = ctx.db.placeable_desc().try_insert(record) {
+            return Err(format!("Couldn't insert PlaceableDesc record with id {id}. Error message: {err}"));
+        }
+    }
+    log::info!("Inserted {} records of type PlaceableDesc", len);
+    Ok(())
+}
+
+#[spacetimedb::reducer]
+pub fn import_placeable_group_desc(ctx: &ReducerContext, records: Vec<PlaceableGroupDesc>) -> Result<(), String> {
+    if !has_role(ctx, &ctx.sender, Role::Admin) {
+        return Err("Invalid permissions".into());
+    }
+    import_placeable_group_desc_internal(ctx, records)?;
+    Ok(())
+}
+fn import_placeable_group_desc_internal(ctx: &ReducerContext, records: Vec<PlaceableGroupDesc>) -> Result<(), String> {
+    for id in ctx.db.placeable_group_desc().iter().map(|item| item.id) {
+        ctx.db.placeable_group_desc().id().delete(&id);
+    }
+    let len: usize = records.len();
+    log::info!("Will insert {} records of type PlaceableGroupDesc", len);
+    for record in records {
+        let id = record.id;
+        if let Err(err) = ctx.db.placeable_group_desc().try_insert(record) {
+            return Err(format!(
+                "Couldn't insert PlaceableGroupDesc record with id {id}. Error message: {err}"
+            ));
+        }
+    }
+    log::info!("Inserted {} records of type PlaceableGroupDesc", len);
+    Ok(())
+}
+
+#[spacetimedb::reducer]
+pub fn import_placeable_growth_desc(ctx: &ReducerContext, records: Vec<PlaceableGrowthDesc>) -> Result<(), String> {
+    if !has_role(ctx, &ctx.sender, Role::Admin) {
+        return Err("Invalid permissions".into());
+    }
+    import_placeable_growth_desc_internal(ctx, records)?;
+    Ok(())
+}
+fn import_placeable_growth_desc_internal(ctx: &ReducerContext, records: Vec<PlaceableGrowthDesc>) -> Result<(), String> {
+    for id in ctx.db.placeable_growth_desc().iter().map(|item| item.id) {
+        ctx.db.placeable_growth_desc().id().delete(&id);
+    }
+
+    let len: usize = records.len();
+    log::info!("Will insert {} records of type PlaceableGrowthDesc", len);
+    for record in records {
+        let id = record.id;
+        if let Err(err) = ctx.db.placeable_growth_desc().try_insert(record) {
+            return Err(format!(
+                "Couldn't insert PlaceableGrowthDesc record with id {id}. Error message: {err}"
+            ));
+        }
+    }
+    log::info!("Inserted {} records of type PlaceableGrowthDesc", len);
+    Ok(())
+}
+
+#[spacetimedb::reducer]
+pub fn import_placeable_placement_desc(ctx: &ReducerContext, records: Vec<PlaceablePlacementDesc>) -> Result<(), String> {
+    if !has_role(ctx, &ctx.sender, Role::Admin) {
+        return Err("Invalid permissions".into());
+    }
+    import_placeable_placement_desc_internal(ctx, records)?;
+    Ok(())
+}
+fn import_placeable_placement_desc_internal(ctx: &ReducerContext, records: Vec<PlaceablePlacementDesc>) -> Result<(), String> {
+    for id in ctx.db.placeable_placement_desc().iter().map(|item| item.id) {
+        ctx.db.placeable_placement_desc().id().delete(&id);
+    }
+
+    let len: usize = records.len();
+    log::info!("Will insert {} records of type PlaceablePlacementDesc", len);
+    for record in records {
+        let id = record.id;
+        if let Err(err) = ctx.db.placeable_placement_desc().try_insert(record) {
+            return Err(format!(
+                "Couldn't insert PlaceablePlacementDesc record with id {id}. Error message: {err}"
+            ));
+        }
+    }
+    log::info!("Inserted {} records of type PlaceablePlacementDesc", len);
+    Ok(())
+}
+
+#[spacetimedb::reducer]
+pub fn import_placeable_interaction_desc(ctx: &ReducerContext, records: Vec<PlaceableInteractionDesc>) -> Result<(), String> {
+    if !has_role(ctx, &ctx.sender, Role::Admin) {
+        return Err("Invalid permissions".into());
+    }
+    import_placeable_interaction_desc_internal(ctx, records)?;
+    Ok(())
+}
+fn import_placeable_interaction_desc_internal(ctx: &ReducerContext, records: Vec<PlaceableInteractionDesc>) -> Result<(), String> {
+    for id in ctx.db.placeable_interaction_desc().iter().map(|item| item.id) {
+        ctx.db.placeable_interaction_desc().id().delete(&id);
+    }
+
+    let len: usize = records.len();
+    log::info!("Will insert {} records of type PlaceableInteractionDesc", len);
+    for record in records {
+        let id = record.id;
+        if let Err(err) = ctx.db.placeable_interaction_desc().try_insert(record) {
+            return Err(format!(
+                "Couldn't insert PlaceableInteractionDesc record with id {id}. Error message: {err}"
+            ));
+        }
+    }
+    log::info!("Inserted {} records of type PlaceableInteractionDesc", len);
+    Ok(())
+}
+
 fn collect_table<T: spacetimedb::Table>(table: &T) -> Vec<T::Row> {
     return table.iter().collect();
 }
@@ -4193,6 +4324,11 @@ pub fn commit_staged_static_data(ctx: &ReducerContext) -> Result<(), String> {
     import_building_buff_desc_internal(ctx, collect_table(ctx.db.staged_building_buff_desc()))?;
     import_equipment_preset_knowledge_desc_internal(ctx, collect_table(ctx.db.staged_equipment_preset_knowledge_desc()))?;
     import_quest_drop_desc_internal(ctx, collect_table(ctx.db.staged_quest_drop_desc()))?;
+    import_placeable_desc_internal(ctx, collect_table(ctx.db.staged_placeable_desc()))?;
+    import_placeable_group_desc_internal(ctx, collect_table(ctx.db.staged_placeable_group_desc()))?;
+    import_placeable_growth_desc_internal(ctx, collect_table(ctx.db.staged_placeable_growth_desc()))?;
+    import_placeable_placement_desc_internal(ctx, collect_table(ctx.db.staged_placeable_placement_desc()))?;
+    import_placeable_interaction_desc_internal(ctx, collect_table(ctx.db.staged_placeable_interaction_desc()))?;
 
     import_static_data_post_processing(ctx)?;
     generate_building_function_mappings(ctx)?;

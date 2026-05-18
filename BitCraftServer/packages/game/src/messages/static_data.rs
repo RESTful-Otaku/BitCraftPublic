@@ -540,6 +540,111 @@ pub struct ResourceDesc {
     pub on_destroy_yield_resource_chance: f32,
 }
 
+#[static_data_staging_table(placeable_desc)]
+#[spacetimedb::table(name = placeable_desc, public)]
+#[derive(Clone, PartialEq, Debug)]
+pub struct PlaceableDesc {
+    #[primary_key]
+    pub id: i32,
+    pub name: String,
+    pub tag: String,
+    pub tier: i32,
+    pub description: String,
+    pub rarity: Rarity,
+    pub model_asset_name: String,
+    pub icon_asset_name: String,
+    pub max_health: i32,
+    pub visible_to_others: bool,
+}
+
+#[static_data_staging_table(placeable_group_desc)]
+#[spacetimedb::table(name = placeable_group_desc, public)]
+#[derive(Clone, PartialEq, Debug)]
+pub struct PlaceableGroupDesc {
+    #[primary_key]
+    pub id: i32,
+    pub name: String,
+    pub placement_limit: u16,
+    pub placeable_ids: Vec<i32>,
+}
+
+#[derive(SpacetimeType, Clone, PartialEq, Debug)]
+pub struct PlaceableGrowthOutcome {
+    pub probability: f32,
+    pub placeable_id: i32,
+}
+
+#[static_data_staging_table(placeable_growth_desc)]
+#[spacetimedb::table(name = placeable_growth_desc, public)]
+#[derive(Clone, PartialEq, Debug)]
+pub struct PlaceableGrowthDesc {
+    #[primary_key]
+    pub id: i32,
+    #[unique]
+    pub placeable_id: i32,
+    pub time: Vec<f32>,
+    pub outcomes: Vec<PlaceableGrowthOutcome>,
+    pub show_time_left: bool,
+}
+
+#[static_data_staging_table(placeable_placement_desc)]
+#[spacetimedb::table(name = placeable_placement_desc, public)]
+#[derive(Clone, PartialEq, Debug)]
+pub struct PlaceablePlacementDesc {
+    #[primary_key]
+    pub id: i32,
+    pub placed_placeable_id: i32,
+    pub input_item: ItemStack,
+    pub required_time: f32,
+    pub level_requirements: Vec<LevelRequirement>,
+    pub tool_requirements: Vec<ToolRequirement>,
+    pub required_knowledges: Vec<i32>,
+    pub blocking_knowledges: Vec<i32>,
+    pub required_biomes: Vec<Biome>,
+    pub place_on_land: bool,
+    pub land_elevation_min: i32,
+    pub land_elevation_max: i32,
+    pub place_on_water: bool,
+    pub water_depth_min: i32,
+    pub water_depth_max: i32,
+    pub required_paving_tier: i32,
+    pub required_interior_tier: i32,
+    pub required_claim_tier: i32,
+    pub min_distance_to_player_claims: i32,
+    pub min_distance_to_group: i32,
+    pub min_distance_to_other_placeables: i32,
+    pub min_distance_to_existing_footprints: i32,
+    pub max_distance_to_buildings: i32,
+    pub buildings: Vec<i32>,
+    pub recipe_performance_id: i32,
+}
+
+#[static_data_staging_table(placeable_interaction_desc)]
+#[spacetimedb::table(name = placeable_interaction_desc, public, index(name = placeable_id, btree(columns = [placeable_id])))]
+#[derive(Clone, PartialEq, Debug)]
+pub struct PlaceableInteractionDesc {
+    #[primary_key]
+    pub id: i32,
+    pub verb_phrase: String,
+    pub placeable_id: i32,
+    pub required_knowledges: Vec<i32>,
+    pub blocking_knowledges: Vec<i32>,
+    pub consumed_item_stacks: Vec<InputItemStack>,
+    pub output_item_stacks: Vec<ItemStack>,
+    pub tool_requirements: Vec<ToolRequirement>,
+    pub level_requirements: Vec<LevelRequirement>,
+    pub experience_per_progress: Vec<ExperienceStackF32>,
+    pub time_requirement: f32,
+    pub stamina_requirement: f32,
+    pub tool_durability_lost: i32,
+    pub range: i32,
+    pub allow_use_hands: bool,
+    pub power_multiplier: f32,
+    pub recipe_performance_id: i32,
+    pub on_destroy_spawned_placeable_id: i32,
+    pub on_destroy_spawned_placeable_chance: f32,
+}
+
 #[static_data_staging_table(cargo_desc)]
 #[spacetimedb::table(name = cargo_desc, public)]
 #[derive(Clone, PartialEq, Debug)]

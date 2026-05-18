@@ -89,6 +89,7 @@ use crate::passive_craft_state;
 use crate::paved_tile_state;
 use crate::permission_state;
 use crate::pillar_shaping_state;
+use crate::placeable_state;
 use crate::player_action_state;
 use crate::player_housing_customization_state;
 use crate::player_housing_moving_cost_state;
@@ -199,6 +200,7 @@ pub fn delete_entity(ctx: &ReducerContext, entity_id: u64) {
    ctx.db.partial_experience_state().entity_id().delete(entity_id);
    ctx.db.paved_tile_state().entity_id().delete(entity_id);
    ctx.db.pillar_shaping_state().entity_id().delete(entity_id);
+   ctx.db.placeable_state().entity_id().delete(entity_id);
    ctx.db.player_action_state().entity_id().delete(entity_id);
    ctx.db.player_lowercase_username_state().entity_id().delete(entity_id);
    ctx.db.player_note_state().entity_id().delete(entity_id);
@@ -315,6 +317,7 @@ pub fn clear_entity(ctx: &ReducerContext, entity_id: u64) {
    ctx.db.paved_tile_state().entity_id().delete(entity_id);
    ctx.db.permission_state().entity_id().delete(entity_id);
    ctx.db.pillar_shaping_state().entity_id().delete(entity_id);
+   ctx.db.placeable_state().entity_id().delete(entity_id);
    ctx.db.player_action_state().entity_id().delete(entity_id);
    ctx.db.player_housing_customization_state().entity_id().delete(entity_id);
    ctx.db.player_housing_moving_cost_state().entity_id().delete(entity_id);

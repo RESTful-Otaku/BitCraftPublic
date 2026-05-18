@@ -4,8 +4,11 @@ use spacetimedb::{log, ReducerContext, Table};
 
 use crate::{
     agents, growth_state, location_state,
-    messages::{authentication::ServerIdentity, components::ResourceState},
-    parameters_desc, resource_desc, resource_growth_recipe_desc, resource_state,
+    messages::{
+        authentication::ServerIdentity,
+        components::{PlaceableState, ResourceState},
+    },
+    parameters_desc, placeable_growth_desc, placeable_state, resource_desc, resource_growth_recipe_desc, resource_state,
 };
 
 #[spacetimedb::table(name = growth_loop_timer, scheduled(growth_agent_loop, at = scheduled_at))]
@@ -67,8 +70,8 @@ fn growth_agent_loop(ctx: &ReducerContext, _timer: GrowthLoopTimer) {
 
     let now = ctx.timestamp;
     for grown in ctx.db.growth_state().iter().filter(|ga| ga.end_timestamp < now) {
-        // Only evolve if the resource is there (which it should be, otherwise the growth component would have been deleted)
         if let Some(deposit) = ctx.db.resource_state().entity_id().find(&grown.entity_id) {
+            // Only evolve if the resource is there (which it should be, otherwise the growth component would have been deleted)
             // Stored the recipe instead of the id in case someday we grow non-resources or have
             // a grown entity evolving into a different type of entity
             let loc = match ctx.db.location_state().entity_id().find(&grown.entity_id) {
@@ -96,6 +99,32 @@ fn growth_agent_loop(ctx: &ReducerContext, _timer: GrowthLoopTimer) {
                     false,
                 )
                 .unwrap();
+            }
+        } else if let Some(placeable) = ctx.db.placeable_state().entity_id().find(&grown.entity_id) {
+            let loc = match ctx.db.location_state().entity_id().find(&grown.entity_id) {
+                Some(l) => l,
+                None => {
+                    spacetimedb::log::error!("GrowthState {} is missing location", grown.entity_id);
+                    continue;
+                }
+            };
+            let coordinates = loc.coordinates();
+            let direction = placeable.direction_index;
+            let owner_entity_id = placeable.owner_entity_id;
+            placeable.despawn(ctx);
+
+            let recipe = ctx.db.placeable_growth_desc().id().find(&grown.growth_recipe_id).unwrap();
+            let target_placeable_id = PlaceableState::pick_growth_outcome(ctx, &recipe.outcomes);
+            if target_placeable_id != 0 {
+                if let Err(err) = PlaceableState::spawn(
+                    ctx,
+                    target_placeable_id,
+                    owner_entity_id,
+                    coordinates,
+                    direction,
+                ) {
+                    log::error!("Unable to grow placeable {} into {}: {}", grown.entity_id, target_placeable_id, err);
+                }
             }
         }
     }

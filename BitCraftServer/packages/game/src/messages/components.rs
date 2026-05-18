@@ -160,6 +160,8 @@ pub enum PlayerActionType {
     DestroyPillarShaping,
     AbilityCustom,
     Prospect,
+    PlacePlaceable,
+    InteractPlaceable,
 }
 
 #[derive(spacetimedb::SpacetimeType, Clone, Copy, PartialEq, Debug)]
@@ -985,6 +987,19 @@ pub struct ResourceState {
     pub entity_id: u64,
 
     pub resource_id: i32,
+    pub direction_index: i32,
+}
+
+#[spacetimedb::table(name = placeable_state, public,
+    index(name = owner_entity_id, btree(columns = [owner_entity_id])),
+    index(name = placeable_id, btree(columns = [placeable_id])))]
+#[derive(Clone, Debug, bitcraft_macro::Operations)]
+#[operations(delete)]
+pub struct PlaceableState {
+    #[primary_key]
+    pub entity_id: u64,
+    pub owner_entity_id: u64,
+    pub placeable_id: i32,
     pub direction_index: i32,
 }
 

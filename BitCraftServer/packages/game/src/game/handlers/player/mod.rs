@@ -31,6 +31,8 @@ pub mod paving_place_tile;
 pub mod permission_edit;
 pub mod pillar_shaping_destroy_pillar;
 pub mod pillar_shaping_place_pillar;
+pub mod placeable_interact;
+pub mod placeable_place;
 pub mod player_action_cancel;
 pub mod player_climb;
 pub mod player_complete_task;
