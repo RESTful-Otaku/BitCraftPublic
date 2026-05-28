@@ -1,13 +1,13 @@
 use spacetimedb::{ReducerContext, Table};
 
 use crate::{
-    deployable_collectible_state, deployable_state,
+    deployable_collectible_state, deployable_state_v2,
     game::game_state,
     messages::{
         components::{VaultCollectible, VaultState},
         static_data::*,
     },
-    player_prefs_state, vault_state, DeployableCollectibleState, DeployableState, PlayerState,
+    player_prefs_state, vault_state, DeployableCollectibleState, DeployableStateV2, PlayerState,
 };
 
 impl VaultState {
@@ -68,13 +68,14 @@ impl VaultState {
                     let username = PlayerState::username_by_id(ctx, self.entity_id).unwrap();
                     let deployable = ctx
                         .db
-                        .deployable_state()
-                        .try_insert(DeployableState {
+                        .deployable_state_v2()
+                        .try_insert(DeployableStateV2 {
                             entity_id: game_state::create_entity(ctx),
                             owner_id: self.entity_id,
                             claim_entity_id: 0,
                             direction: 0,
                             deployable_description_id: deployable_description.id,
+                            appearance_override_id: 0,
                             nickname: format!("{}'s {}", username, deployable_description.name),
                             hidden: false,
                         })

@@ -16,7 +16,7 @@ use crate::messages::components::{
 use crate::messages::game_util::{ActiveBuff, ExperienceStack, ItemStack, LevelRequirement};
 use crate::messages::static_data::*;
 use crate::{
-    active_buff_state, character_stats_state, claim_state, deployable_state, dimension_description_state, equipment_state,
+    active_buff_state, character_stats_state, claim_state, deployable_state_v2, dimension_description_state, equipment_state,
     experience_state, exploration_chunks_state, knowledge_secondary_state, location_cache, mobile_entity_state, mounting_state,
     player_username_state, toolbar_state, unwrap_or_err, unwrap_or_return, KnowledgeState,
 };
@@ -505,7 +505,7 @@ impl PlayerState {
         */
         // Collect stats from deployable
         if let Some(mounting) = ctx.db.mounting_state().entity_id().find(&player_entity_id) {
-            if let Some(deployable) = ctx.db.deployable_state().entity_id().find(&mounting.deployable_entity_id) {
+            if let Some(deployable) = ctx.db.deployable_state_v2().entity_id().find(&mounting.deployable_entity_id) {
                 Self::collect_deployable_stats(ctx, deployable.deployable_description_id, &mut bonuses);
             }
         }

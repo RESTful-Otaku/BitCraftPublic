@@ -1230,7 +1230,7 @@ impl InventoryState {
     {
         let mut inventories_with_distance: Vec<(InventoryState, i32)> = Vec::new();
 
-        for deployable in ctx.db.deployable_state().owner_id().filter(player_entity_id) {
+        for deployable in ctx.db.deployable_state_v2().owner_id().filter(player_entity_id) {
             if deployable.hidden {
                 continue;
             }

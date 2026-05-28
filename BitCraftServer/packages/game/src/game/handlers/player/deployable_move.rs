@@ -63,7 +63,7 @@ pub fn deployable_move(ctx: &ReducerContext, request: PlayerDeployableMoveReques
     // Validate Boat Move. Note that this for the short term, ideally at some point
     // we will re-enable the above _validate_move that has more comprehensive checks
     let deployable = unwrap_or_err!(
-        ctx.db.deployable_state().entity_id().find(&deployable_entity_id),
+        ctx.db.deployable_state_v2().entity_id().find(&deployable_entity_id),
         "Deployable not found!"
     );
     let desc = unwrap_or_err!(

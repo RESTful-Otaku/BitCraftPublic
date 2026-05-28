@@ -916,6 +916,26 @@ pub struct DeployableState {
     pub hidden: bool,
 }
 
+#[spacetimedb::table(name = deployable_state_v2, public,
+    index(name = owner_id, btree(columns = [owner_id])),
+    index(name = claim_entity_id, btree(columns = [claim_entity_id])))]
+#[derive(bitcraft_macro::Operations, Clone, Debug)]
+#[operations(delete)]
+pub struct DeployableStateV2 {
+    // Sort fields in order of decreasing size/alignment
+    // to take advantage of a serialization fast-path in SpacetimeDB.
+    #[primary_key]
+    pub entity_id: u64,
+
+    pub owner_id: u64,
+    pub claim_entity_id: u64,
+    pub direction: i32, // for deployables and initial orientation. Not updated in realtime as you move.
+    pub deployable_description_id: i32,
+    pub nickname: String, //This will be used as tooltip text
+    pub hidden: bool,
+    pub appearance_override_id: i32,
+}
+
 #[spacetimedb::table(name = mounting_state, public, index(name = deployable_entity_id, btree(columns = [deployable_entity_id])))]
 #[derive(bitcraft_macro::Operations, Clone)]
 #[operations(delete)]

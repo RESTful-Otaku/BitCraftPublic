@@ -3217,6 +3217,38 @@ fn import_deployable_desc_internal(ctx: &ReducerContext, records: Vec<Deployable
 }
 
 #[spacetimedb::reducer]
+pub fn import_deployable_appearance_override_desc(
+    ctx: &ReducerContext,
+    records: Vec<DeployableAppearanceOverrideDesc>,
+) -> Result<(), String> {
+    if !has_role(ctx, &ctx.sender, Role::Admin) {
+        return Err("Invalid permissions".into());
+    }
+    import_deployable_appearance_override_desc_internal(ctx, records)?;
+    Ok(())
+}
+fn import_deployable_appearance_override_desc_internal(
+    ctx: &ReducerContext,
+    records: Vec<DeployableAppearanceOverrideDesc>,
+) -> Result<(), String> {
+    for id in ctx.db.deployable_appearance_override_desc().iter().map(|item| item.id) {
+        ctx.db.deployable_appearance_override_desc().id().delete(&id);
+    }
+    let len: usize = records.len();
+    log::info!("Will insert {} records of type DeployableAppearanceOverrideDesc", len);
+    for record in records {
+        let id = record.id;
+        if let Err(err) = ctx.db.deployable_appearance_override_desc().try_insert(record) {
+            return Err(format!(
+                "Couldn't insert DeployableAppearanceOverrideDesc record with id {id}. Error message: {err}"
+            ));
+        }
+    }
+    log::info!("Inserted {} records of type DeployableAppearanceOverrideDesc", len);
+    Ok(())
+}
+
+#[spacetimedb::reducer]
 pub fn import_deployable_state(ctx: &ReducerContext, records: Vec<DeployableState>) {
     if !has_role(ctx, &ctx.sender, Role::Admin) {
         log::error!("Invalid permissions");
@@ -4295,6 +4327,10 @@ pub fn commit_staged_static_data(ctx: &ReducerContext) -> Result<(), String> {
     import_traveler_task_knowledge_requirement_desc_internal(ctx, collect_table(ctx.db.staged_traveler_task_knowledge_requirement_desc()))?;
     import_traveler_trade_order_desc_internal(ctx, collect_table(ctx.db.staged_traveler_trade_order_desc()))?;
     import_deployable_desc_internal(ctx, collect_table(ctx.db.staged_deployable_desc()))?;
+    import_deployable_appearance_override_desc_internal(
+        ctx,
+        collect_table(ctx.db.staged_deployable_appearance_override_desc()),
+    )?;
     import_weapon_desc_internal(ctx, collect_table(ctx.db.staged_weapon_desc()))?;
     import_onboarding_reward_desc_internal(ctx, collect_table(ctx.db.staged_onboarding_reward_desc()))?;
     import_terraform_recipe_desc_internal(ctx, collect_table(ctx.db.staged_terraform_recipe_desc()))?;

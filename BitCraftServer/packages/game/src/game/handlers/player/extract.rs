@@ -225,7 +225,7 @@ fn reduce(
 
     let mut deployable_radius = 0.0;
     if let Some(mounting) = mounting {
-        let deployable = ctx.db.deployable_state().entity_id().find(mounting.deployable_entity_id).unwrap();
+        let deployable = ctx.db.deployable_state_v2().entity_id().find(mounting.deployable_entity_id).unwrap();
         let deployable_desc = ctx.db.deployable_desc().id().find(deployable.deployable_description_id).unwrap();
         deployable_radius = deployable_desc.radius;
         if !deployable_desc.allow_driver_extract {

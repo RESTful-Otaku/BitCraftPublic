@@ -22,6 +22,7 @@ pub mod admin_grant_collectibles;
 pub mod admin_manage_developers;
 pub mod admin_manage_gated_features;
 pub mod admin_migrate_action_state;
+pub mod admin_migrate_deployable_state_v2;
 pub mod admin_migrate_trade_orders;
 pub mod admin_npc_helpers;
 pub mod admin_onboarding_reducers;

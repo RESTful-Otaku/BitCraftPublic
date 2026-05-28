@@ -86,7 +86,7 @@ pub fn empire_create(ctx: &ReducerContext, request: EmpireCreateRequest) -> Resu
 
     send_inter_module_message(
         ctx,
-        crate::messages::inter_module::MessageContentsV2::EmpireCreate(EmpireCreateMsg {
+        crate::messages::inter_module::MessageContentsV3::EmpireCreate(EmpireCreateMsg {
             player_entity_id: actor_id,
             building_entity_id: request.building_entity_id,
             color1_id: request.color1_id,

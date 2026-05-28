@@ -32,6 +32,7 @@ use crate::crumb_trail_contribution_lock_state;
 use crate::crumb_trail_contribution_spent_state;
 use crate::crumb_trail_state;
 use crate::deployable_state;
+use crate::deployable_state_v2;
 use crate::dimension_description_state;
 use crate::dimension_network_state;
 use crate::distant_visible_entity;
@@ -148,6 +149,7 @@ pub fn delete_entity(ctx: &ReducerContext, entity_id: u64) {
    ctx.db.combat_immunity_state().entity_id().delete(entity_id);
    ctx.db.combat_state().entity_id().delete(entity_id);
    ctx.db.deployable_state().entity_id().delete(entity_id);
+   ctx.db.deployable_state_v2().entity_id().delete(entity_id);
    ctx.db.dimension_description_state().entity_id().delete(entity_id);
    ctx.db.dimension_network_state().entity_id().delete(entity_id);
    ctx.db.distant_visible_entity().entity_id().delete(entity_id);
@@ -260,6 +262,7 @@ pub fn clear_entity(ctx: &ReducerContext, entity_id: u64) {
    ctx.db.crumb_trail_contribution_spent_state().entity_id().delete(entity_id);
    ctx.db.crumb_trail_state().entity_id().delete(entity_id);
    ctx.db.deployable_state().entity_id().delete(entity_id);
+   ctx.db.deployable_state_v2().entity_id().delete(entity_id);
    ctx.db.dimension_description_state().entity_id().delete(entity_id);
    ctx.db.dimension_network_state().entity_id().delete(entity_id);
    ctx.db.distant_visible_entity().entity_id().delete(entity_id);

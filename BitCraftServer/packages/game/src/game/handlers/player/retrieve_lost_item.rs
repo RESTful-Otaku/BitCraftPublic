@@ -46,7 +46,7 @@ pub fn retrieve_lost_item(ctx: &ReducerContext, request: PlayerRetrieveLostItemR
 
         if target_inventory.owner_entity_id != actor_id {
             let target_deployable = unwrap_or_err!(
-                ctx.db.deployable_state().entity_id().find(target_inventory.owner_entity_id),
+                ctx.db.deployable_state_v2().entity_id().find(target_inventory.owner_entity_id),
                 "Invalid transfer destination"
             );
             if target_deployable.owner_id != actor_id {

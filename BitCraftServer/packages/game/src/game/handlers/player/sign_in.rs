@@ -164,7 +164,7 @@ pub fn sign_in(ctx: &ReducerContext, _request: PlayerSignInRequest) -> Result<()
     // Display hidden deployables
     let deployable_ids: Vec<_> = ctx
         .db
-        .deployable_state()
+        .deployable_state_v2()
         .owner_id()
         .filter(actor_id)
         .map(|deployable| (deployable.entity_id, deployable.hidden))
@@ -175,9 +175,9 @@ pub fn sign_in(ctx: &ReducerContext, _request: PlayerSignInRequest) -> Result<()
 
         //set hidden deployable visible
         if hidden {
-            let mut deployable = ctx.db.deployable_state().entity_id().find(&entity_id).unwrap();
+            let mut deployable = ctx.db.deployable_state_v2().entity_id().find(&entity_id).unwrap();
             deployable.hidden = false;
-            ctx.db.deployable_state().entity_id().update(deployable);
+            ctx.db.deployable_state_v2().entity_id().update(deployable);
         }
     }
 

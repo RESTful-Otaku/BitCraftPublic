@@ -1,11 +1,11 @@
 use spacetimedb::ReducerContext;
 
 use crate::{
-    building_state, deployable_state,
+    building_state, deployable_state_v2,
     game::{entities::inventory_type::InventoryType, permission_helper},
     location_state, loot_chest_state,
     messages::{components::{claim_state, dropped_inventory_state, BuildingState, Permission, PermissionState}, static_data::{building_desc, BuildingCategory}},
-    mobile_entity_state, mounting_state, unwrap_or_err, ClaimPermission, DeployableState, SmallHexTile,
+    mobile_entity_state, mounting_state, unwrap_or_err, ClaimPermission, DeployableStateV2, SmallHexTile,
 };
 
 const MAX_INTERACTION_DISTANCE: i32 = 2;
@@ -42,7 +42,7 @@ fn validate_deployable(
     ctx: &ReducerContext,
     actor_id: u64,
     player_location: SmallHexTile,
-    deployable: &DeployableState,
+    deployable: &DeployableStateV2,
 ) -> Result<(), String> {
     if deployable.owner_id != actor_id {
         return Err("You don't have permission to interact with this deployable's inventory".into());
@@ -116,7 +116,7 @@ pub fn validate_interact(
         return Ok(InventoryType::Building);
     }
 
-    if let Some(deployable) = ctx.db.deployable_state().entity_id().find(&owner_entity_id) {
+    if let Some(deployable) = ctx.db.deployable_state_v2().entity_id().find(&owner_entity_id) {
         validate_deployable(ctx, actor_id, player_location, &deployable)?;
         return Ok(InventoryType::Deployable);
     }

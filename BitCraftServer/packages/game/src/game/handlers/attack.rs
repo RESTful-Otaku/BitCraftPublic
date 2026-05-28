@@ -80,7 +80,7 @@ pub fn attack_start(ctx: &ReducerContext, request: EntityAttackRequest) -> Resul
 
         if let Some(ms) = ctx.db.mounting_state().entity_id().find(attacker_id) {
             let deployable_state = unwrap_or_err!(
-                ctx.db.deployable_state().entity_id().find(ms.deployable_entity_id),
+                ctx.db.deployable_state_v2().entity_id().find(ms.deployable_entity_id),
                 "Deployable doesn't exist"
             );
             let deployable_desc = unwrap_or_err!(

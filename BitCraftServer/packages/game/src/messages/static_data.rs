@@ -104,6 +104,7 @@ pub enum CollectibleType {
     Emote,
     HousingWalls,
     HousingFloor,
+    DeployableAppearanceOverride,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, spacetimedb::SpacetimeType)]
@@ -881,6 +882,19 @@ pub struct DeployableDesc {
     pub radius: f32, // for now, range (in tiles) to halt pathfinding when extracting from a deployable. Using a f32 in case it's used later for some kind of pathfinding radius.
     #[default(false)]
     pub allow_hunting: bool,
+}
+
+#[static_data_staging_table(deployable_appearance_override_desc)]
+#[spacetimedb::table(name = deployable_appearance_override_desc, public, index(name = collectible_id, btree(columns = [collectible_id])), index(name = affected_model_address, btree(columns = [affected_model_address])))]
+#[derive(Clone, PartialEq, Debug)]
+pub struct DeployableAppearanceOverrideDesc {
+    #[primary_key]
+    pub id: i32,
+    #[unique]
+    pub collectible_id: i32,
+    pub affected_model_address: String,
+    pub model_address: String,
+    pub icon_asset_name: String,
 }
 
 #[spacetimedb::table(name = crafting_recipe_discovery_item_desc, index(name = item_id, btree(columns = [requirement_id])))]

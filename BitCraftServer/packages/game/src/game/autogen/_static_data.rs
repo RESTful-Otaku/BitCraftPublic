@@ -95,6 +95,9 @@ pub fn clear_staged_static_data(ctx: &ReducerContext) -> Result<(), String> {
     for r in ctx.db.staged_deconstruction_recipe_desc().iter() {
         ctx.db.staged_deconstruction_recipe_desc().delete(r);
     }
+    for r in ctx.db.staged_deployable_appearance_override_desc().iter() {
+        ctx.db.staged_deployable_appearance_override_desc().delete(r);
+    }
     for r in ctx.db.staged_deployable_desc().iter() {
         ctx.db.staged_deployable_desc().delete(r);
     }
@@ -709,6 +712,20 @@ pub fn stage_deconstruction_recipe_desc(ctx: &ReducerContext, records: Vec<Decon
     }
     for r in records {
         if let Err(e) = ctx.db.staged_deconstruction_recipe_desc().try_insert(r.clone()) {
+            spacetimedb::log::error!("Failed to stage record {:?}: {}", r, e);
+            return Err(e.to_string());
+        }
+    }
+    Ok(())
+}
+
+#[spacetimedb::reducer]
+pub fn stage_deployable_appearance_override_desc(ctx: &ReducerContext, records: Vec<DeployableAppearanceOverrideDesc>) -> Result<(), String> {
+    if !has_role(ctx, &ctx.sender, Role::Admin) {
+        return Err("Invalid permissions".into());
+    }
+    for r in records {
+        if let Err(e) = ctx.db.staged_deployable_appearance_override_desc().try_insert(r.clone()) {
             spacetimedb::log::error!("Failed to stage record {:?}: {}", r, e);
             return Err(e.to_string());
         }
@@ -1850,6 +1867,9 @@ pub fn validate_staged_data(ctx: &ReducerContext) -> Result<(), String> {
     }
     if ctx.db.staged_deconstruction_recipe_desc().count() == 0 {
         return Err("Staged data for DeconstructionRecipeDesc is empty, aborting.".into());
+    }
+    if ctx.db.staged_deployable_appearance_override_desc().count() == 0 {
+        return Err("Staged data for DeployableAppearanceOverrideDesc is empty, aborting.".into());
     }
     if ctx.db.staged_deployable_desc().count() == 0 {
         return Err("Staged data for DeployableDesc is empty, aborting.".into());

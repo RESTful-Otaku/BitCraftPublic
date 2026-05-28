@@ -108,8 +108,8 @@ pub fn placeable_at_coordinates(ctx: &ReducerContext, coordinates: &SmallHexTile
         .next()
 }
 
-pub fn deployables_at_coordinates<'a>(ctx: &'a ReducerContext, coordinates: SmallHexTile) -> impl Iterator<Item = DeployableState> + 'a {
-    MobileEntityState::select_all(ctx, coordinates).filter_map(|x| ctx.db.deployable_state().entity_id().find(x.entity_id))
+pub fn deployables_at_coordinates<'a>(ctx: &'a ReducerContext, coordinates: SmallHexTile) -> impl Iterator<Item = DeployableStateV2> + 'a {
+    MobileEntityState::select_all(ctx, coordinates).filter_map(|x| ctx.db.deployable_state_v2().entity_id().find(x.entity_id))
 }
 
 pub fn paving_at_coordinates(ctx: &ReducerContext, coordinates: &SmallHexTile) -> Option<PavedTileState> {

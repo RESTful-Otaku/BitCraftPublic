@@ -147,7 +147,7 @@ pub fn send_message(
 ) {
     send_inter_module_message(
         ctx,
-        crate::messages::inter_module::MessageContentsV2::EmpireStartSiege(EmpireStartSiegeMsg {
+        crate::messages::inter_module::MessageContentsV3::EmpireStartSiege(EmpireStartSiegeMsg {
             building_coord: game_state_filters::coordinates(ctx, building_entity_id).into(),
             player_entity_id,
             building_entity_id,
@@ -173,7 +173,7 @@ pub fn handle_destination_result_on_sender(ctx: &ReducerContext, request: Empire
 
         if request.deployable_entity_id > 0 {
             ctx.db.mobile_entity_state().entity_id().delete(&request.deployable_entity_id);
-            ctx.db.deployable_state().entity_id().delete(&request.deployable_entity_id);
+            ctx.db.deployable_state_v2().entity_id().delete(&request.deployable_entity_id);
         }
 
         PlayerNotificationEvent::new_event(ctx, request.player_entity_id, error.unwrap(), NotificationSeverity::ReducerError);
