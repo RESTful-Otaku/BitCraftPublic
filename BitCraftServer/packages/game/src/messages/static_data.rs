@@ -254,6 +254,8 @@ pub enum EnemyType {
     
     EnragedAlphaJakyl = 41,
     DeerSwift = 42,
+
+    CrystalizedHexiteCrab = 43,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, spacetimedb::SpacetimeType)]
@@ -372,6 +374,9 @@ pub enum CharacterStatType {
     HexiteGatheringSpeed,
     HexiteGatheringCritChance,
     HexiteGatheringCritMultiplier,
+    CartSpeed,
+    MountSpeed,
+    BoatSpeed,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, spacetimedb::SpacetimeType)]
@@ -539,6 +544,10 @@ pub struct ResourceDesc {
     pub show_time_left: bool,
     #[default(1.0f32)]
     pub on_destroy_yield_resource_chance: f32,
+    #[default(0)]
+    pub on_destroy_yield_resource_min_radius: i32,
+    #[default(0)]
+    pub on_destroy_yield_resource_max_radius: i32,
 }
 
 #[static_data_staging_table(placeable_desc)]
@@ -573,6 +582,14 @@ pub struct PlaceableGroupDesc {
 pub struct PlaceableGrowthOutcome {
     pub probability: f32,
     pub placeable_id: i32,
+}
+
+#[derive(SpacetimeType, Clone, PartialEq, Debug)]
+pub struct ExtractionSpawnedPlaceable {
+    pub placeable_id: i32,
+    pub chance: f32,
+    pub radius_min: i32,
+    pub radius_max: i32,
 }
 
 #[static_data_staging_table(placeable_growth_desc)]
@@ -1045,6 +1062,8 @@ pub struct ExtractionRecipeDesc {
     pub show_in_progression: bool,
     #[default(None::<EmpirePermission>)]
     pub empire_permission_required: Option<EmpirePermission>,
+    #[default(None::<Vec<ExtractionSpawnedPlaceable>>)]
+    pub spawned_placeables: Option<Vec<ExtractionSpawnedPlaceable>>,
 }
 
 #[static_data_staging_table(deconstruction_recipe_desc)]

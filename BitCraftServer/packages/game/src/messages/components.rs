@@ -109,6 +109,10 @@ pub enum Biome {
     Cave,
     Jungle,
     Sapwoods,
+    DesertedBeach,
+    TropicalCanopy,
+    VolcanicCrag,
+    UnchartedOcean,
 }
 
 #[derive(spacetimedb::SpacetimeType, Clone, Copy, Debug, Default, PartialEq, Eq, EnumIter, PartialOrd, Ord, Hash)]
@@ -1265,6 +1269,18 @@ pub struct ExplorationChunksState {
 
     pub bitmap: Vec<u64>, //Essentially a bitfield. Index=(Z*W+X)/64, bit=(Z*W+X)%64
     pub explored_chunks_count: i32,
+}
+
+#[spacetimedb::table(name = exploration_chunks_state_v2, public)]
+#[derive(Clone, bitcraft_macro::Operations, Debug)]
+#[operations(delete)]
+pub struct ExplorationChunksStateV2 {
+    #[primary_key]
+    pub entity_id: u64,
+
+    pub bitmap: Vec<u64>, //Essentially a bitfield. Index=(Z*W+X)/64, bit=(Z*W+X)%64
+    pub explored_chunks_count: i32,
+    pub achievement_explored_chunks_count: i32,
 }
 
 #[spacetimedb::table(name = loot_chest_state, public)]

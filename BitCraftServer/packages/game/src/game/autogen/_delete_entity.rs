@@ -46,6 +46,7 @@ use crate::equipment_preset_state;
 use crate::equipment_state;
 use crate::experience_state;
 use crate::exploration_chunks_state;
+use crate::exploration_chunks_state_v2;
 use crate::extract_outcome_state;
 use crate::extract_outcome_state_v1;
 use crate::footprint_tile_state;
@@ -161,6 +162,7 @@ pub fn delete_entity(ctx: &ReducerContext, entity_id: u64) {
    ctx.db.equipment_state().entity_id().delete(entity_id);
    ctx.db.experience_state().entity_id().delete(entity_id);
    ctx.db.exploration_chunks_state().entity_id().delete(entity_id);
+   ctx.db.exploration_chunks_state_v2().entity_id().delete(entity_id);
    ctx.db.extract_outcome_state().entity_id().delete(entity_id);
    ctx.db.extract_outcome_state_v1().entity_id().delete(entity_id);
    ctx.db.footprint_tile_state().entity_id().delete(entity_id);
@@ -276,6 +278,7 @@ pub fn clear_entity(ctx: &ReducerContext, entity_id: u64) {
    ctx.db.equipment_state().entity_id().delete(entity_id);
    ctx.db.experience_state().entity_id().delete(entity_id);
    ctx.db.exploration_chunks_state().entity_id().delete(entity_id);
+   ctx.db.exploration_chunks_state_v2().entity_id().delete(entity_id);
    ctx.db.extract_outcome_state().entity_id().delete(entity_id);
    ctx.db.extract_outcome_state_v1().entity_id().delete(entity_id);
    ctx.db.footprint_tile_state().entity_id().delete(entity_id);

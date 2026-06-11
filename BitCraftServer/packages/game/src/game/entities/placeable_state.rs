@@ -1,12 +1,13 @@
-use std::time::Duration;
-
 use spacetimedb::rand::Rng;
 use spacetimedb::{ReducerContext, Table};
 
 use crate::messages::components::{GrowthState, LocationState, PlaceableState};
 use crate::messages::static_data::*;
 use crate::{
-    game::{autogen::_delete_entity::delete_entity, coordinates::*, game_state},
+    game::{
+        autogen::_delete_entity::delete_entity, coordinates::*, dimensions, game_state, game_state::game_state_filters,
+        terrain_chunk::TerrainChunkCache,
+    },
     growth_state, health_state, location_state, placeable_growth_desc, placeable_state, unwrap_or_err, HealthState,
 };
 
@@ -84,6 +85,41 @@ impl PlaceableState {
         Ok(())
     }
 
+    pub fn spawn_in_radius_band(
+        ctx: &ReducerContext,
+        placeable_id: i32,
+        owner_entity_id: u64,
+        center: SmallHexTile,
+        direction_index: i32,
+        min_radius: i32,
+        max_radius: i32,
+    ) -> Result<bool, String> {
+        if placeable_id == 0 {
+            return Ok(false);
+        }
+
+        let mut terrain_cache = TerrainChunkCache::empty();
+        let min_radius = min_radius.max(0);
+        let max_radius = max_radius.max(0);
+
+        let candidates = if min_radius == 0 && max_radius == 0 {
+            vec![center]
+        } else {
+            SmallHexTile::shuffled_coordinates_between_radius(center, min_radius, max_radius, &mut ctx.rng())
+        };
+
+        for coordinates in candidates {
+            if !Self::is_valid_spawn_tile(ctx, &mut terrain_cache, coordinates) {
+                continue;
+            }
+
+            Self::spawn(ctx, placeable_id, owner_entity_id, coordinates, direction_index)?;
+            return Ok(true);
+        }
+
+        Ok(false)
+    }
+
     pub fn pick_growth_outcome(ctx: &ReducerContext, outcomes: &[PlaceableGrowthOutcome]) -> i32 {
         if outcomes.is_empty() {
             return 0;
@@ -111,20 +147,27 @@ impl PlaceableState {
 
     fn add_growth_state(ctx: &ReducerContext, entity_id: u64, placeable_id: i32) {
         if let Some(growth) = ctx.db.placeable_growth_desc().placeable_id().find(&placeable_id) {
-            let duration = if growth.time.len() <= 1 {
-                growth.time.first().copied().unwrap_or(0.0)
-            } else {
-                ctx.rng().gen_range(growth.time[0]..=growth.time[1])
-            };
-
-            ctx.db
-                .growth_state()
-                .try_insert(GrowthState {
-                    entity_id,
-                    end_timestamp: ctx.timestamp + Duration::from_secs_f32(duration),
-                    growth_recipe_id: growth.id,
-                })
-                .unwrap();
+            let _ = ctx.db.growth_state().try_insert(GrowthState::new_from_placeable(ctx, entity_id, growth));
         }
+    }
+
+    fn is_valid_spawn_tile(ctx: &ReducerContext, terrain_cache: &mut TerrainChunkCache, coordinates: SmallHexTile) -> bool {
+        if game_state_filters::has_hitbox_footprint(ctx, coordinates) {
+            return false;
+        }
+
+        if LocationState::select_all(ctx, &coordinates)
+            .filter_map(|location| ctx.db.placeable_state().entity_id().find(&location.entity_id))
+            .next()
+            .is_some()
+        {
+            return false;
+        }
+
+        if coordinates.dimension != dimensions::OVERWORLD && !game_state_filters::is_interior_tile_walkable(ctx, coordinates) {
+            return false;
+        }
+
+        terrain_cache.get_terrain_cell(ctx, &coordinates.parent_large_tile()).is_some()
     }
 }

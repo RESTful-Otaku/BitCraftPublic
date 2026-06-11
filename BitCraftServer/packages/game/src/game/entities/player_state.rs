@@ -17,7 +17,7 @@ use crate::messages::game_util::{ActiveBuff, ExperienceStack, ItemStack, LevelRe
 use crate::messages::static_data::*;
 use crate::{
     active_buff_state, character_stats_state, claim_state, deployable_state_v2, dimension_description_state, equipment_state,
-    experience_state, exploration_chunks_state, knowledge_secondary_state, location_cache, mobile_entity_state, mounting_state,
+    experience_state, exploration_chunks_state_v2, knowledge_secondary_state, location_cache, mobile_entity_state, mounting_state,
     player_username_state, toolbar_state, unwrap_or_err, unwrap_or_return, KnowledgeState,
 };
 
@@ -148,12 +148,12 @@ impl PlayerState {
         let in_overworld = target_coordinates.dimension == dimensions::OVERWORLD;
         if in_overworld & ((previous_chunk.x != entered_chunk.x) | (previous_chunk.z != entered_chunk.z)) {
             let mut exploration_chunks = unwrap_or_err!(
-                ctx.db.exploration_chunks_state().entity_id().find(&entity_id),
+                ctx.db.exploration_chunks_state_v2().entity_id().find(&entity_id),
                 "Missing exploration_chunks_state in move_player_and_explore"
             );
             if exploration_chunks.explore_chunk(ctx, &entered_chunk, None) {
                 PlayerState::discover_ruins_in_chunk(ctx, entity_id, entered_chunk);
-                ctx.db.exploration_chunks_state().entity_id().update(exploration_chunks);
+                ctx.db.exploration_chunks_state_v2().entity_id().update(exploration_chunks);
             }
         }
 

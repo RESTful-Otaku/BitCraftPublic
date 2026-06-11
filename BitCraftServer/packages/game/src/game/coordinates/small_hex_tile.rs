@@ -5,6 +5,8 @@ use super::hex_coordinates::HexCoordinates;
 use crate::game::coordinates::*;
 use crate::game::unity_helpers::vector2::Vector2;
 use crate::FootprintType;
+use spacetimedb::rand::seq::SliceRandom;
+use spacetimedb::rand::Rng;
 use std::convert::From;
 use std::fmt::Display;
 use std::hash::Hash;
@@ -303,6 +305,27 @@ impl SmallHexTile {
 
     pub fn ring_iter(center: SmallHexTile, radius: i32) -> impl Iterator<Item = SmallHexTile> {
         return HexCoordinates::ring_iter(center.into(), radius).map(|a| SmallHexTile::from(a));
+    }
+
+    pub fn shuffled_coordinates_between_radius(
+        center: SmallHexTile,
+        min_radius: i32,
+        max_radius: i32,
+        rng: &mut impl Rng,
+    ) -> Vec<SmallHexTile> {
+        if min_radius == 0 && max_radius == 0 {
+            return Vec::new();
+        }
+
+        let mut candidate_tiles = SmallHexTile::coordinates_in_radius_with_center_iter(center, max_radius)
+            .filter(|candidate| {
+                let distance = center.distance_to(*candidate);
+                distance >= min_radius && distance <= max_radius
+            })
+            .collect::<Vec<_>>();
+
+        candidate_tiles.shuffle(rng);
+        candidate_tiles
     }
 
     pub fn closest(&self, locations: &Vec<SmallHexTile>) -> Option<SmallHexTile> {

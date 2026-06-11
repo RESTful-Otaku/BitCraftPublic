@@ -225,7 +225,12 @@ fn reduce(
 
     let mut deployable_radius = 0.0;
     if let Some(mounting) = mounting {
-        let deployable = ctx.db.deployable_state_v2().entity_id().find(mounting.deployable_entity_id).unwrap();
+        let deployable = ctx
+            .db
+            .deployable_state_v2()
+            .entity_id()
+            .find(mounting.deployable_entity_id)
+            .unwrap();
         let deployable_desc = ctx.db.deployable_desc().id().find(deployable.deployable_description_id).unwrap();
         deployable_radius = deployable_desc.radius;
         if !deployable_desc.allow_driver_extract {
@@ -354,12 +359,9 @@ fn reduce(
                 })
                 .collect();
 
-            InventoryState::withdraw_from_player_inventory_and_nearby_deployables(
-                ctx,
-                actor_id,
-                &consumed_item_stacks,
-                |x| get_distance(ctx, &deposit, coordinates, x),
-            )?;
+            InventoryState::withdraw_from_player_inventory_and_nearby_deployables(ctx, actor_id, &consumed_item_stacks, |x| {
+                get_distance(ctx, &deposit, coordinates, x)
+            })?;
         }
 
         if recipe.tool_durability_lost > 0 {
@@ -432,6 +434,27 @@ fn reduce(
                 // demolish on claim doesn't provide discovery
                 discovery.acquire_extract(ctx, recipe.id);
                 discovery.acquire_resource(ctx, recipe.resource_id);
+            }
+
+            if damage_output > 0 {
+                if let Some(spawned_placeables) = &recipe.spawned_placeables {
+                    for spawned_placeable in spawned_placeables {
+                        let scaled_spawn_chance = (spawned_placeable.chance * damage_output as f32).clamp(0.0, 1.0);
+                        if scaled_spawn_chance > 0.0
+                            && (scaled_spawn_chance >= 1.0 || ctx.rng().gen_range(0.0..=1.0) <= scaled_spawn_chance)
+                        {
+                            let _ = PlaceableState::spawn_in_radius_band(
+                                ctx,
+                                spawned_placeable.placeable_id,
+                                actor_id,
+                                coordinates,
+                                deposit.direction_index,
+                                spawned_placeable.radius_min,
+                                spawned_placeable.radius_max,
+                            );
+                        }
+                    }
+                }
             }
         }
 

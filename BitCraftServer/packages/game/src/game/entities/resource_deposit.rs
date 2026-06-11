@@ -1,5 +1,4 @@
 use std::collections::HashSet;
-use std::time::Duration;
 
 use crate::game::autogen::_delete_entity::delete_entity;
 use crate::game::handlers::resource::respawn_resource_in_chunk::{respawn_resource_in_chunk_timer, RespawnResourceInChunkTimer};
@@ -223,7 +222,46 @@ impl ResourceState {
         };
 
         if respawn_resource_id != 0 && should_spawn {
-            Self::schedule_resource_spawn(ctx, respawn_resource_id, coord, deposit_direction);
+            let respawn_resource_health = ctx.db.resource_desc().id().find(&respawn_resource_id).unwrap().max_health;
+            let mut spawn_candidates =
+                if resource_desc.on_destroy_yield_resource_min_radius == 0 && resource_desc.on_destroy_yield_resource_max_radius == 0 {
+                    vec![coord]
+                } else {
+                    SmallHexTile::shuffled_coordinates_between_radius(
+                        coord,
+                        resource_desc.on_destroy_yield_resource_min_radius,
+                        resource_desc.on_destroy_yield_resource_max_radius,
+                        &mut ctx.rng(),
+                    )
+                };
+
+            for candidate in spawn_candidates.drain(..) {
+                if Self::spawn(
+                    ctx,
+                    None,
+                    respawn_resource_id,
+                    candidate,
+                    deposit_direction,
+                    respawn_resource_health,
+                    true,
+                    true,
+                )
+                .is_ok()
+                {
+                    return;
+                }
+            }
+
+            let _ = Self::spawn(
+                ctx,
+                None,
+                respawn_resource_id,
+                coord,
+                deposit_direction,
+                respawn_resource_health,
+                false,
+                false,
+            );
         }
     }
 
@@ -338,6 +376,8 @@ impl ResourceState {
             }
         }
 
+        game_state::insert_location(ctx, entity_id, offset);
+
         Self::insert_one(ctx, deposit_state)?;
 
         Self::add_growth_state(ctx, entity_id, resource_id);
@@ -345,8 +385,6 @@ impl ResourceState {
         let health_state = ResourceHealthState { entity_id, health };
 
         ctx.db.resource_health_state().try_insert(health_state)?;
-
-        game_state::insert_location(ctx, entity_id, offset);
         Self::create_distant_visibile_resource(ctx, &resource_desc, entity_id, coordinates);
 
         if resource_desc.footprint.is_empty() {
@@ -367,18 +405,7 @@ impl ResourceState {
         let growth = ctx.db.resource_growth_recipe_desc().resource_id().filter(resource_id).next();
         // For now we assume only 1 entry per resource. Will add some logic if multiple recipes can target the same resource id.
         if let Some(growth) = growth {
-            let duration = if growth.time.len() == 1 {
-                growth.time[0]
-            } else {
-                ctx.rng().gen_range(growth.time[0]..=growth.time[1])
-            };
-
-            let growth_state = GrowthState {
-                entity_id,
-                end_timestamp: ctx.timestamp + Duration::from_secs_f32(duration),
-                growth_recipe_id: growth.id,
-            };
-            ctx.db.growth_state().try_insert(growth_state).unwrap();
+            let _ = ctx.db.growth_state().try_insert(GrowthState::new(ctx, entity_id, growth)).unwrap();
         }
     }
 

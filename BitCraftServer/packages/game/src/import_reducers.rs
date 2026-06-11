@@ -1217,17 +1217,17 @@ pub fn import_experience_state(ctx: &ReducerContext, records: Vec<ExperienceStat
 }
 
 #[spacetimedb::reducer]
-pub fn import_exploration_chunks_state(ctx: &ReducerContext, records: Vec<ExplorationChunksState>) {
+pub fn import_exploration_chunks_state(ctx: &ReducerContext, records: Vec<ExplorationChunksStateV2>) {
     if !has_role(ctx, &ctx.sender, Role::Admin) {
         log::error!("Invalid permissions");
         return ();
     }
-    log::info!("Will insert {} records of type ExplorationChunksState", records.len());
+    log::info!("Will insert {} records of type ExplorationChunksStateV2", records.len());
     let len = records.len();
     for record in records {
-        ctx.db.exploration_chunks_state().try_insert(record).unwrap();
+        ctx.db.exploration_chunks_state_v2().try_insert(record).unwrap();
     }
-    log::info!("Inserted {} records of type ExplorationChunksState", len);
+    log::info!("Inserted {} records of type ExplorationChunksStateV2", len);
 }
 
 #[spacetimedb::reducer]
@@ -4247,6 +4247,22 @@ fn collect_table<T: spacetimedb::Table>(table: &T) -> Vec<T::Row> {
     return table.iter().collect();
 }
 
+fn refresh_traveler_trade_orders_if_changed(
+    ctx: &ReducerContext,
+    old_orders: Vec<TravelerTradeOrderDesc>,
+    new_orders: Vec<TravelerTradeOrderDesc>,
+) {
+    let old_orders_by_id: HashMap<i32, TravelerTradeOrderDesc> = old_orders.into_iter().map(|order| (order.id, order)).collect();
+    let new_orders_by_id: HashMap<i32, TravelerTradeOrderDesc> = new_orders.into_iter().map(|order| (order.id, order)).collect();
+
+    if old_orders_by_id == new_orders_by_id {
+        return;
+    }
+
+    log::info!("TravelerTradeOrderDesc changed, refreshing traveler trade orders...");
+    NpcState::refresh_all_traveler_trade_orders(ctx);
+}
+
 #[spacetimedb::reducer]
 pub fn commit_staged_static_data(ctx: &ReducerContext) -> Result<(), String> {
     if !has_role(ctx, &ctx.sender, Role::Admin) {
@@ -4258,6 +4274,7 @@ pub fn commit_staged_static_data(ctx: &ReducerContext) -> Result<(), String> {
     validate_staged_data(ctx)?;
 
     let old_achievements = collect_table(ctx.db.achievement_desc());
+    let old_traveler_trade_orders = collect_table(ctx.db.traveler_trade_order_desc());
 
     import_parameters_desc_internal(ctx, collect_table(ctx.db.staged_parameters_desc()))?;
     import_private_parameters_desc_internal(ctx, collect_table(ctx.db.staged_private_parameters_desc()))?;
@@ -4327,10 +4344,7 @@ pub fn commit_staged_static_data(ctx: &ReducerContext) -> Result<(), String> {
     import_traveler_task_knowledge_requirement_desc_internal(ctx, collect_table(ctx.db.staged_traveler_task_knowledge_requirement_desc()))?;
     import_traveler_trade_order_desc_internal(ctx, collect_table(ctx.db.staged_traveler_trade_order_desc()))?;
     import_deployable_desc_internal(ctx, collect_table(ctx.db.staged_deployable_desc()))?;
-    import_deployable_appearance_override_desc_internal(
-        ctx,
-        collect_table(ctx.db.staged_deployable_appearance_override_desc()),
-    )?;
+    import_deployable_appearance_override_desc_internal(ctx, collect_table(ctx.db.staged_deployable_appearance_override_desc()))?;
     import_weapon_desc_internal(ctx, collect_table(ctx.db.staged_weapon_desc()))?;
     import_onboarding_reward_desc_internal(ctx, collect_table(ctx.db.staged_onboarding_reward_desc()))?;
     import_terraform_recipe_desc_internal(ctx, collect_table(ctx.db.staged_terraform_recipe_desc()))?;
@@ -4375,6 +4389,7 @@ pub fn commit_staged_static_data(ctx: &ReducerContext) -> Result<(), String> {
 
     admin_update_light_source_states(ctx)?;
     migrate_achievements(ctx, &old_achievements)?;
+    refresh_traveler_trade_orders_if_changed(ctx, old_traveler_trade_orders, collect_table(ctx.db.traveler_trade_order_desc()));
     crate::game::discovery::Discovery::refresh_all_players_knowledges(ctx);
 
     clear_staged_static_data(ctx)?;

@@ -13,6 +13,9 @@ use crate::{
 };
 use spacetimedb::ReducerContext;
 
+const FULL_WIND_BONUS_ANGLE_RAD: f32 = std::f32::consts::PI / 3.0;
+const PARTIAL_WIND_BONUS_ANGLE_RAD: f32 = std::f32::consts::PI * 2.0 / 3.0;
+
 #[spacetimedb::reducer]
 #[feature_gate]
 pub fn deployable_move(ctx: &ReducerContext, request: PlayerDeployableMoveRequest) -> Result<(), String> {
@@ -180,7 +183,7 @@ fn validate_move(
 
     if source_coordinates.x != prev_origin.x || source_coordinates.z != prev_origin.z {
         let base_speed = if deployable_desc.use_player_speed_modifier {
-            speed as f32 * PlayerState::get_stat(ctx, actor_id, CharacterStatType::MovementMultiplier)
+            speed as f32 * CharacterStatsState::get_deployable_speed_multiplier(ctx, actor_id, deployable_desc.deployable_type)
         } else {
             speed as f32
         };
@@ -202,7 +205,7 @@ fn validate_move(
             }
 
             let angle = angle.abs();
-            if angle < std::f32::consts::PI / 4.0 {
+            if angle < FULL_WIND_BONUS_ANGLE_RAD {
                 //Speed *= 1 + (.5 + SailingLevel / 2)%
                 let sailing_lvl = ctx
                     .db
@@ -212,7 +215,7 @@ fn validate_move(
                     .expect("Player has no EpxerienceState")
                     .get_level(SkillType::Sailing as i32);
                 prev_speed *= 1.0 + (0.4 + sailing_lvl as f32 / 100.0 * 0.4) * deployable_desc.affected_by_wind;
-            } else if angle < std::f32::consts::PI / 2.0 {
+            } else if angle < PARTIAL_WIND_BONUS_ANGLE_RAD {
                 //Speed *= 1 + (.5 + SailingLevel / 4)%
                 let sailing_lvl = ctx
                     .db

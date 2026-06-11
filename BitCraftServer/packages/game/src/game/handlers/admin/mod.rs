@@ -49,4 +49,5 @@ pub mod admin_unlock_house;
 pub mod admin_update_housing_portals;
 pub mod admin_update_light_source_states;
 pub mod admin_update_lore_knowledge;
+pub mod migrate_exploration_achievement_counts;
 pub mod update_chunk_index;

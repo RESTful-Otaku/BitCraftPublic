@@ -240,12 +240,12 @@ fn create_player(ctx: &ReducerContext, entity_id: u64) -> Result<u64, String> {
 
     let region = ctx.db.world_region_state().id().find(&0).unwrap();
     let world_width = region.world_width_chunks();
-    let mut exploration_state = ExplorationChunksState::new(ctx, entity_id, Some(region));
+    let mut exploration_state = ExplorationChunksStateV2::new(ctx, entity_id, Some(region));
     let explored_chunks_coordinates = ChunkCoordinates::from(spawn_coordinates).surrounding_and_including(ctx);
     for chunk in &explored_chunks_coordinates {
         exploration_state.explore_chunk(ctx, chunk, Some(world_width));
     }
-    ctx.db.exploration_chunks_state().try_insert(exploration_state)?;
+    ctx.db.exploration_chunks_state_v2().try_insert(exploration_state)?;
 
     generate_knowledges(ctx, entity_id);
 
@@ -550,7 +550,7 @@ fn create_player(ctx: &ReducerContext, entity_id: u64) -> Result<u64, String> {
 
     send_inter_module_message(
         ctx,
-        crate::messages::inter_module::MessageContentsV2::OnRegionPlayerCreated(OnRegionPlayerCreatedMsg {
+        crate::messages::inter_module::MessageContentsV4::OnRegionPlayerCreated(OnRegionPlayerCreatedMsg {
             player_entity_id: entity_id,
         }),
         crate::inter_module::InterModuleDestination::Global,
