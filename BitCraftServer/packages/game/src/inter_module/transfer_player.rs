@@ -337,9 +337,7 @@ pub fn process_message_on_destination(ctx: &ReducerContext, _sender: u8, mut msg
     let allow_cancel = msg.allow_cancel;
     let with_vehicle = msg.vehicle.is_some();
     let teleport_energy_cost = msg.teleport_energy_cost;
-    if teleport_energy_cost > 0.0 {
-        msg.teleportation_energy_state.expend_energy(teleport_energy_cost, false);
-    }
+    msg.teleportation_energy_state.expend_energy(teleport_energy_cost, true);
 
     insert_player(ctx, msg, loc, prev_loc);
 

@@ -13,7 +13,7 @@ pub fn process_message_on_destination(ctx: &ReducerContext, request: AdminBroadc
     for player in ctx.db.signed_in_player_state().iter() {
         ctx.db.direct_message_state().try_insert(DirectMessageState {
             entity_id: create_entity(ctx),
-            username: "Whisp".into(),
+            username: "Wisp".into(),
             title_id: 0,
             sender_entity_id: 0,
             receiver_entity_id: player.entity_id,

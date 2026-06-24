@@ -109,7 +109,7 @@ impl PlaceableState {
         };
 
         for coordinates in candidates {
-            if !Self::is_valid_spawn_tile(ctx, &mut terrain_cache, coordinates) {
+            if !Self::is_valid_spawn_tile(ctx, &mut terrain_cache, owner_entity_id, coordinates) {
                 continue;
             }
 
@@ -151,15 +151,19 @@ impl PlaceableState {
         }
     }
 
-    fn is_valid_spawn_tile(ctx: &ReducerContext, terrain_cache: &mut TerrainChunkCache, coordinates: SmallHexTile) -> bool {
+    fn is_valid_spawn_tile(
+        ctx: &ReducerContext,
+        terrain_cache: &mut TerrainChunkCache,
+        owner_entity_id: u64,
+        coordinates: SmallHexTile,
+    ) -> bool {
         if game_state_filters::has_hitbox_footprint(ctx, coordinates) {
             return false;
         }
 
         if LocationState::select_all(ctx, &coordinates)
             .filter_map(|location| ctx.db.placeable_state().entity_id().find(&location.entity_id))
-            .next()
-            .is_some()
+            .any(|placeable| placeable.owner_entity_id == owner_entity_id)
         {
             return false;
         }

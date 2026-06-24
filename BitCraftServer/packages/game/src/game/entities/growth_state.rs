@@ -14,11 +14,12 @@ use crate::{
 
 impl GrowthState {
     pub fn new(ctx: &ReducerContext, entity_id: u64, resource_growth_recipe_desc: ResourceGrowthRecipeDesc) -> GrowthState {
-        broadcast_growth(ctx, entity_id, &resource_growth_recipe_desc);
+        let end_timestamp = ctx.timestamp + Duration::from_secs_f32(get_duration(ctx, resource_growth_recipe_desc.time.clone()));
+        broadcast_growth(ctx, entity_id, &resource_growth_recipe_desc, end_timestamp);
 
         GrowthState {
             entity_id,
-            end_timestamp: ctx.timestamp + Duration::from_secs_f32(get_duration(ctx, resource_growth_recipe_desc.time)),
+            end_timestamp,
             growth_recipe_id: resource_growth_recipe_desc.id,
         }
     }
@@ -39,7 +40,12 @@ fn get_duration(ctx: &ReducerContext, time: Vec<f32>) -> f32 {
     ctx.rng().gen_range(time[0]..=time[1])
 }
 
-fn broadcast_growth(ctx: &ReducerContext, entity_id: u64, resource_growth_recipe_desc: &ResourceGrowthRecipeDesc) {
+fn broadcast_growth(
+    ctx: &ReducerContext,
+    entity_id: u64,
+    resource_growth_recipe_desc: &ResourceGrowthRecipeDesc,
+    end_timestamp: spacetimedb::Timestamp,
+) {
     const INACTIVE_HEXITE_SEALED_CHEST_GROWTH_ID: i32 = 1633012503;
     if resource_growth_recipe_desc.id != INACTIVE_HEXITE_SEALED_CHEST_GROWTH_ID {
         return;
@@ -50,7 +56,6 @@ fn broadcast_growth(ctx: &ReducerContext, entity_id: u64, resource_growth_recipe
         .parent_large_tile()
         .to_offset_coordinates();
     let region = unwrap_or_return!(ctx.db.world_region_state().id().find(0), "Unknown region");
-    let end_timestamp = ctx.timestamp + Duration::from_secs_f32(get_duration(ctx, resource_growth_recipe_desc.time.clone()));
 
     ctx.db.sytem_chat_broadcast_timer().insert(SystemChatBroadcastTimer {
         scheduled_id: 0,

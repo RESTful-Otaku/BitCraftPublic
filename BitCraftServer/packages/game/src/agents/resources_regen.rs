@@ -690,24 +690,16 @@ fn is_valid_resource_node_options(
 
         // DAB Note: On the client those checks are not per biome, so they should be serialized differently.
         // For this reason, we can return FALSE if any of those checks fail since they will contain the same data.
-        if info.spawns_on_land {
-            if water_level > elevation {
-                return false;
-            } else {
-                if elevation < info.land_elevation_min || elevation > info.land_elevation_max {
-                    return false;
-                }
-            }
-        } else if info.spawns_in_water {
-            if water_level < elevation {
-                return false;
-            } else {
-                let water_depth = water_level - elevation;
-                if water_depth < info.water_depth_min || water_depth > info.water_depth_max {
-                    return false;
-                }
-            }
-        } else {
+        if !is_valid_land_or_water(
+            info.spawns_on_land,
+            info.land_elevation_min,
+            info.land_elevation_max,
+            info.spawns_in_water,
+            info.water_depth_min,
+            info.water_depth_max,
+            elevation,
+            water_level,
+        ) {
             return false;
         }
 
@@ -755,6 +747,29 @@ fn is_valid_resource_node_options(
             return true;
         }
     }
+    false
+}
+
+fn is_valid_land_or_water(
+    spawns_on_land: bool,
+    land_elevation_min: i16,
+    land_elevation_max: i16,
+    spawns_in_water: bool,
+    water_depth_min: i16,
+    water_depth_max: i16,
+    elevation: i16,
+    water_level: i16,
+) -> bool {
+    let is_submerged = water_level > elevation;
+    let water_depth = water_level - elevation;
+
+    if spawns_on_land && !is_submerged && elevation >= land_elevation_min && elevation <= land_elevation_max {
+        return true;
+    }
+    if spawns_in_water && is_submerged && water_depth >= water_depth_min && water_depth <= water_depth_max {
+        return true;
+    }
+
     false
 }
 
