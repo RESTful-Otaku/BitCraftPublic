@@ -181,7 +181,7 @@ pub fn validate_siege_distance(
     let watchtower_location = game_state_filters::coordinates(ctx, building_entity_id);
     let distance = watchtower_location.distance_to(coord);
     let params = ctx.db.parameters_desc().version().find(&0).unwrap();
-    let min = params.empire_min_siege_distance + padding;
+    let min = params.empire_min_siege_distance - padding;
     let max = params.empire_max_siege_distance + padding;
     if distance < min || distance > max {
         return Err(format!("{{0}} within {{1}} and {{2}} tiles from the target watchtower|~{error_message}|~{min}|~{max}"));
