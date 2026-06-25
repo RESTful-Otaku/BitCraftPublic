@@ -9,6 +9,7 @@ use crate::{
     game::{
         entities::building_state::{BuildingState, InventoryState},
         game_state,
+        handlers::inventory::inventory_helper,
         reducer_helpers::player_action_helpers,
     },
     messages::{
@@ -397,6 +398,9 @@ pub fn reduce(ctx: &ReducerContext, entity_id: u64, shop_entity_id: u64, trade_o
                     .collect(),
                 amount,
             )?;
+            for cargo_itemstack in &cargo_itemstacks {
+                inventory_helper::validate_cargo_target(ctx, &cargo_inventory, cargo_itemstack)?;
+            }
             if !cargo_inventory.add_multiple(ctx, &cargo_itemstacks) {
                 return Err("Building stockpile is full".into());
             }

@@ -852,7 +852,7 @@ fn is_valid_cell(
             }
             if let Some(deposit) = ctx.db.resource_state().entity_id().find(fp.owner_entity_id) {
                 if let Some(resource_desc) = resource_desc.get(&deposit.resource_id) {
-                    if resource_desc.spawn_priority >= spawn_priority {
+                    if !resource_desc.flattenable || resource_desc.spawn_priority >= spawn_priority {
                         return false;
                     }
                 }

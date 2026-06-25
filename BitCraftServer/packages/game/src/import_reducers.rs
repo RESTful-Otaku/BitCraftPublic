@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use crate::agents;
 use crate::game::autogen::_static_data::{clear_staged_static_data, validate_staged_data};
 use crate::game::handlers::admin::admin_update_light_source_states::admin_update_light_source_states;
+use crate::game::handlers::admin::admin_update_resource_light_source_states::update_resource_light_source_states;
 use crate::game::handlers::authentication::has_role;
 use crate::game::handlers::migration::migrate_achievements::migrate_achievements;
 use crate::game::world_gen::resources_log::{resources_log, ResourcesLog};
@@ -4388,6 +4389,7 @@ pub fn commit_staged_static_data(ctx: &ReducerContext) -> Result<(), String> {
     }
 
     admin_update_light_source_states(ctx)?;
+    update_resource_light_source_states(ctx);
     migrate_achievements(ctx, &old_achievements)?;
     refresh_traveler_trade_orders_if_changed(ctx, old_traveler_trade_orders, collect_table(ctx.db.traveler_trade_order_desc()));
     crate::game::discovery::Discovery::refresh_all_players_knowledges(ctx);

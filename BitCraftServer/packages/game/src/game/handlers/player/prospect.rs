@@ -318,6 +318,9 @@ fn reduce(
             }
             player_prospecting.completed_steps += 1;
             player_prospecting.contribution += prospecting_desc.contribution_per_visited_bread_crumb;
+            if prospecting_desc.single_contribution_only {
+                player_prospecting.contribution = player_prospecting.contribution.min(1);
+            }
             player_prospecting.ongoing_step += 1; //crumb_trail.active_step;           // for now, fast-track to the end but don't skip any step
             updated_trail = true;
 

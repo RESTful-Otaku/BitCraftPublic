@@ -10,7 +10,12 @@ use crate::{
         game_state::{self, game_state_filters},
         reducer_helpers::player_action_helpers,
     },
-    messages::{action_request::PlayerPlaceableInteractRequest, components::*, game_util::{ItemStack, ItemType}, static_data::*},
+    messages::{
+        action_request::PlayerPlaceableInteractRequest,
+        components::*,
+        game_util::{ItemStack, ItemType},
+        static_data::*,
+    },
     unwrap_or_err, InventoryState,
 };
 
@@ -83,7 +88,7 @@ pub fn placeable_interact(ctx: &ReducerContext, request: PlayerPlaceableInteract
     PlayerTimestampState::refresh(ctx, actor_id, ctx.timestamp);
 
     let stats = unwrap_or_err!(ctx.db.character_stats_state().entity_id().find(&actor_id), "Player doesn't exist");
-    player_action_helpers::schedule_clear_player_action(
+    player_action_helpers::schedule_clear_player_action_on_err(
         actor_id,
         PlayerActionType::InteractPlaceable.get_layer(ctx),
         reduce(ctx, actor_id, request, stats, false),
@@ -199,12 +204,11 @@ fn reduce(
                 })
                 .collect();
 
-            if let Err(err) = InventoryState::withdraw_from_player_inventory_and_nearby_deployables(
-                ctx,
-                actor_id,
-                &consumed_item_stacks,
-                |target| target.distance_to(placeable_coordinates),
-            ) {
+            if let Err(err) =
+                InventoryState::withdraw_from_player_inventory_and_nearby_deployables(ctx, actor_id, &consumed_item_stacks, |target| {
+                    target.distance_to(placeable_coordinates)
+                })
+            {
                 if consumed_item_stacks.is_empty() {
                     return Err(err);
                 }

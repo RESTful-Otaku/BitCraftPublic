@@ -7,7 +7,8 @@ use crate::game::reducer_helpers::{footprint_helpers, footprint_helpers::delete_
 use crate::game::{coordinates::*, dimensions, game_state};
 use crate::messages::authentication::ServerIdentity;
 use crate::messages::components::{
-    distant_visible_entity, location_state, DistantVisibleEntity, FootprintTileState, GrowthState, LocationState, ResourceState,
+    distant_visible_entity, light_source_state, location_state, DistantVisibleEntity, FootprintTileState, GrowthState, LightSourceState,
+    LocationState, ResourceState,
 };
 use crate::messages::generic::{resource_count, ResourceCount};
 use crate::messages::static_data::*;
@@ -202,6 +203,7 @@ impl ResourceState {
             );
             return false;
         }
+        ctx.db.light_source_state().entity_id().delete(&deposit_entity_id);
         delete_footprint(ctx, deposit_entity_id);
         AttachedHerdsState::delete(ctx, deposit_entity_id);
         delete_entity(ctx, deposit_entity_id);
@@ -297,6 +299,7 @@ impl ResourceState {
         // We do not want to use insert_one so that type of resource isn't added to the eco-system
         // and considered for the resources regen
         ctx.db.resource_state().try_insert(deposit_state)?;
+        Self::insert_light_source_state(ctx, entity_id, resource.light_radius);
 
         let health_state = ResourceHealthState { entity_id, health };
 
@@ -379,6 +382,7 @@ impl ResourceState {
         game_state::insert_location(ctx, entity_id, offset);
 
         Self::insert_one(ctx, deposit_state)?;
+        Self::insert_light_source_state(ctx, entity_id, resource_desc.light_radius);
 
         Self::add_growth_state(ctx, entity_id, resource_id);
 
@@ -423,4 +427,14 @@ impl ResourceState {
             });
         }
     }
+
+    fn insert_light_source_state(ctx: &ReducerContext, entity_id: u64, light_radius: i32) {
+        if light_radius > 0 {
+            ctx.db.light_source_state().insert(LightSourceState {
+                entity_id,
+                radius: light_radius as f32,
+            });
+        }
+    }
+
 }

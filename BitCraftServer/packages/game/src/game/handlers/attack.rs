@@ -656,6 +656,15 @@ fn attack_impact_reduce(
                         exp_contribution_multiplier = (prospecting.completed_steps as f32 / max_contribution_nodes as f32).min(1.0);
                         if prospecting.completed_steps != prospecting.total_steps - 1 {
                             prospecting.ongoing_step = prospecting.total_steps - 1;
+                        }
+                        if prospecting_desc.single_contribution_only {
+                            prospecting.contribution -= 1;
+                            if prospecting.contribution <= 0 {
+                                ctx.db.prospecting_state().entity_id().delete(prospecting.entity_id);
+                            } else {
+                                ctx.db.prospecting_state().entity_id().update(prospecting);
+                            }
+                        } else if prospecting.completed_steps != prospecting.total_steps - 1 {
                             ctx.db.prospecting_state().entity_id().update(prospecting);
                         }
                     }

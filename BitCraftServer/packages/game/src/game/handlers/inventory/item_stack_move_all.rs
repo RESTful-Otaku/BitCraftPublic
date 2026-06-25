@@ -75,6 +75,8 @@ pub fn item_stack_move_all(ctx: &ReducerContext, request: PlayerItemStackMoveAll
             return Err("You cannot use this reducer on the same inventory instance".into());
         }
     }
+    inventory_helper::validate_cargo_target(ctx, &target_inventory, &source_item)?;
+
     if !target_inventory.fits(ctx, source_item.clone_with_quantity(1)) {
         return Err("~Target inventory is full".into());
     }

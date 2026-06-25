@@ -13,7 +13,12 @@ use crate::{
         reducer_helpers::player_action_helpers,
         terrain_chunk::TerrainChunkCache,
     },
-    messages::{action_request::PlayerPlaceablePlaceRequest, components::*, game_util::LevelRequirement, static_data::*},
+    messages::{
+        action_request::PlayerPlaceablePlaceRequest,
+        components::*,
+        game_util::{ItemStack, ItemType, LevelRequirement},
+        static_data::*,
+    },
     unwrap_or_err, InventoryState,
 };
 
@@ -109,9 +114,28 @@ fn reduce(ctx: &ReducerContext, actor_id: u64, request: PlayerPlaceablePlaceRequ
 
     if !dry_run {
         let input_items = vec![recipe.input_item.clone()];
-        InventoryState::withdraw_from_player_inventory_and_nearby_deployables(ctx, actor_id, &input_items, |target| {
+        if let Err(_) = InventoryState::withdraw_from_player_inventory_and_nearby_deployables(ctx, actor_id, &input_items, |target| {
             target.distance_to(coordinates)
-        })?;
+        }) {
+            let item_name = match recipe.input_item.item_type {
+                ItemType::Item => ctx
+                    .db
+                    .item_desc()
+                    .id()
+                    .find(&recipe.input_item.item_id)
+                    .map(|item| item.name)
+                    .unwrap_or_else(|| "Unknown item".into()),
+                ItemType::Cargo => ctx
+                    .db
+                    .cargo_desc()
+                    .id()
+                    .find(&recipe.input_item.item_id)
+                    .map(|cargo| cargo.name)
+                    .unwrap_or_else(|| "Unknown cargo".into()),
+            };
+
+            return Err(format!("Requires: {{0}} x{{1}}|~{}|~{}", item_name, recipe.input_item.quantity));
+        }
 
         PlaceableState::spawn(ctx, placeable_desc.id, actor_id, coordinates, request.facing_direction)?;
     }

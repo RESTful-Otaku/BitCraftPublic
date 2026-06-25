@@ -548,6 +548,8 @@ pub struct ResourceDesc {
     pub on_destroy_yield_resource_min_radius: i32,
     #[default(0)]
     pub on_destroy_yield_resource_max_radius: i32,
+    #[default(0)]
+    pub light_radius: i32,
 }
 
 #[static_data_staging_table(placeable_desc)]
@@ -691,6 +693,10 @@ pub struct CargoDesc {
     pub tag: String,
     pub rarity: Rarity,
     pub not_pickupable: bool,
+    #[default(false)]
+    pub cannot_store_in_buildings: bool,
+    #[default(false)]
+    pub cannot_store_in_deployables: bool,
 }
 
 #[static_data_staging_table(pillar_shaping_desc)]
@@ -2483,6 +2489,9 @@ pub struct ProspectingDesc {
 
     #[default(0.0)]
     pub pct_nodes_for_max_contribution: f32,
+
+    #[default(false)]
+    pub single_contribution_only: bool,
 }
 
 #[static_data_staging_table(equipment_preset_knowledge_desc)]

@@ -87,7 +87,11 @@ pub fn reduce(ctx: &ReducerContext, actor_id: u64, vault_index: i32, activated: 
         }
     }
 
-    let max_count = collectible_desc.max_equip_count;
+    let max_count = if collectible_desc.collectible_type == CollectibleType::DeployableAppearanceOverride {
+        i32::MAX
+    } else {
+        collectible_desc.max_equip_count
+    };
 
     if max_count == 0 {
         return Err("Cannot activate this collectible.".into());
