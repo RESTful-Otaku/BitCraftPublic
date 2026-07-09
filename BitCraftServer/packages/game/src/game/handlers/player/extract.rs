@@ -32,6 +32,27 @@ use crate::{
 
 use spacetimedb::{log, ReducerContext, Table};
 
+fn format_missing_input_message(ctx: &ReducerContext, required_stack: &ItemStack) -> String {
+    let item_name = match required_stack.item_type {
+        ItemType::Item => ctx
+            .db
+            .item_desc()
+            .id()
+            .find(&required_stack.item_id)
+            .map(|item| item.name)
+            .unwrap_or_else(|| "Unknown item".into()),
+        ItemType::Cargo => ctx
+            .db
+            .cargo_desc()
+            .id()
+            .find(&required_stack.item_id)
+            .map(|cargo| cargo.name)
+            .unwrap_or_else(|| "Unknown cargo".into()),
+    };
+
+    format!("Requires {{0}} {{1}}|~{}|~{}", required_stack.quantity, item_name)
+}
+
 fn event_delay_recipe_id(ctx: &ReducerContext, request: &PlayerExtractRequest, stats: &CharacterStatsState) -> (Duration, Option<i32>) {
     let recipe = ctx.db.extraction_recipe_desc().id().find(&request.recipe_id);
     if recipe.is_none() {
@@ -359,9 +380,17 @@ fn reduce(
                 })
                 .collect();
 
-            InventoryState::withdraw_from_player_inventory_and_nearby_deployables(ctx, actor_id, &consumed_item_stacks, |x| {
-                get_distance(ctx, &deposit, coordinates, x)
-            })?;
+            if let Err(err) =
+                InventoryState::withdraw_from_player_inventory_and_nearby_deployables(ctx, actor_id, &consumed_item_stacks, |x| {
+                    get_distance(ctx, &deposit, coordinates, x)
+                })
+            {
+                if consumed_item_stacks.is_empty() {
+                    return Err(err);
+                }
+
+                return Err(format_missing_input_message(ctx, &consumed_item_stacks[0]));
+            }
         }
 
         if recipe.tool_durability_lost > 0 {

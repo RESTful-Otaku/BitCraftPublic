@@ -105,6 +105,8 @@ pub enum CollectibleType {
     HousingWalls,
     HousingFloor,
     DeployableAppearanceOverride,
+    FaceAccessory,
+    FacialHair,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, spacetimedb::SpacetimeType)]
@@ -783,6 +785,17 @@ pub struct BuildingDesc {
     pub destroy_on_unclaim: bool,
 }
 
+#[static_data_staging_table(building_map_icon_desc)]
+#[spacetimedb::table(name = building_map_icon_desc, public)]
+#[derive(Clone, PartialEq, Debug)]
+pub struct BuildingMapIconDesc {
+    #[primary_key]
+    pub building_id: i32,
+    pub icon_address: String,
+    pub title: String,
+    pub text: String,
+}
+
 // A table that gets auto-built when static data is uploaded. Maps building function IDs to buildings that have that function.
 // For example, there would be an entry for all smelters, an entry for all looms, and an entry for all kilns etc.
 #[spacetimedb::table(name = building_function_type_mapping_desc, public)]
@@ -1030,7 +1043,7 @@ pub struct ResourcePlacementRecipeDesc {
 }
 
 #[static_data_staging_table(resource_growth_recipe_desc)]
-#[spacetimedb::table(name = resource_growth_recipe_desc, index(name = resource_id, btree(columns = [resource_id])))]
+#[spacetimedb::table(name = resource_growth_recipe_desc, public, index(name = resource_id, btree(columns = [resource_id])))]
 #[derive(Clone, PartialEq, Debug)]
 pub struct ResourceGrowthRecipeDesc {
     #[primary_key]
@@ -1266,7 +1279,7 @@ pub struct KnowledgeScrollDesc {
 }
 
 #[static_data_staging_table(knowledge_scroll_type_desc)]
-#[spacetimedb::table(name = knowledge_scroll_type_desc)]
+#[spacetimedb::table(name = knowledge_scroll_type_desc, public)]
 #[derive(Clone, PartialEq, Debug)]
 pub struct KnowledgeScrollTypeDesc {
     #[primary_key]
@@ -1638,6 +1651,8 @@ pub struct TerraformRecipeDesc {
     pub time_per_action: f32,
     pub tool_mesh_index: i32,
     pub recipe_performance_id: i32,
+    #[default(None::<Vec<ProbabilisticItemStack>>)]
+    pub output_item_stacks: Option<Vec<ProbabilisticItemStack>>,
 }
 
 #[static_data_staging_table(emote_desc)]
@@ -1728,7 +1743,7 @@ pub struct LootTableDesc {
 }
 
 #[static_data_staging_table(loot_rarity_desc)]
-#[spacetimedb::table(name = loot_rarity_desc)]
+#[spacetimedb::table(name = loot_rarity_desc, public)]
 #[derive(Clone, PartialEq, Debug)]
 pub struct LootRarityDesc {
     #[primary_key]
@@ -1749,7 +1764,7 @@ pub struct LootChestDesc {
 }
 
 #[static_data_staging_table(building_spawn_desc)]
-#[spacetimedb::table(name = building_spawn_desc, index(name = building_id, btree(columns = [building_id])))]
+#[spacetimedb::table(name = building_spawn_desc, public, index(name = building_id, btree(columns = [building_id])))]
 #[derive(Clone, PartialEq, Debug)]
 pub struct BuildingSpawnDesc {
     #[primary_key]
@@ -1790,7 +1805,7 @@ pub struct SingleResourceToClumpDesc {
 }
 
 #[static_data_staging_table(chest_rarity_desc)]
-#[spacetimedb::table(name = chest_rarity_desc)]
+#[spacetimedb::table(name = chest_rarity_desc, public)]
 #[derive(Clone, PartialEq, Debug)]
 pub struct ChestRarityDesc {
     #[primary_key]
@@ -2187,7 +2202,7 @@ pub struct ClimbRequirementDesc {
 }
 
 #[static_data_staging_table(onboarding_reward_desc)]
-#[spacetimedb::table(name = onboarding_reward_desc)]
+#[spacetimedb::table(name = onboarding_reward_desc, public)]
 #[derive(Clone, PartialEq, Debug)]
 pub struct OnboardingRewardDesc {
     #[primary_key]
@@ -2544,7 +2559,7 @@ pub enum QuestReward {
 }
 
 #[static_data_staging_table(stage_rewards_desc)]
-#[spacetimedb::table(name = stage_rewards_desc)]
+#[spacetimedb::table(name = stage_rewards_desc, public)]
 #[derive(Clone, PartialEq, Debug)]
 pub struct StageRewardsDesc {
     #[primary_key]
