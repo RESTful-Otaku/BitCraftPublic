@@ -62,6 +62,28 @@ fn event_delay(ctx: &ReducerContext, prospecting_id: i32) -> Duration {
     Duration::from_secs_f32(prospecting.unwrap().prospecting_duration)
 }
 
+fn reveal_reward_for_zero_crumb_trail(
+    ctx: &ReducerContext,
+    crumb_trail: &mut CrumbTrailState,
+    prospecting_desc: &ProspectingDesc,
+) {
+    let mut exposed = ctx
+        .db
+        .crumb_trail_exposed_state()
+        .crumb_trail_entity_id()
+        .find(crumb_trail.entity_id)
+        .unwrap();
+
+    exposed.exposed_locations.push(crumb_trail.prize_location);
+    if prospecting_desc.enemy_ai_desc_id != 0 {
+        exposed.exposed_herd_entity_id = crumb_trail.spawn_herd_prize(ctx, prospecting_desc);
+    } else {
+        crumb_trail.replace_prize_resources(ctx, prospecting_desc);
+    }
+
+    ctx.db.crumb_trail_exposed_state().crumb_trail_entity_id().update(exposed);
+}
+
 fn reduce(
     ctx: &ReducerContext,
     terrain_cache: &mut TerrainChunkCache,
@@ -202,7 +224,7 @@ fn reduce(
             });
             log!("* Joining existing CrumbTrail {{0}}|~{}", trail.entity_id);
         } else {
-            if let Some(new_trail) = CrumbTrailState::create(ctx, player_location, prospecting_id) {
+            if let Some(mut new_trail) = CrumbTrailState::create(ctx, player_location, prospecting_id) {
                 player_prospecting = Some(ProspectingState {
                     entity_id: actor_id,
                     prospecting_id,
@@ -221,6 +243,10 @@ fn reduce(
                     exposed_locations: Vec::new(),
                     exposed_herd_entity_id: 0,
                 });
+
+                if new_trail.crumb_locations.is_empty() {
+                    reveal_reward_for_zero_crumb_trail(ctx, &mut new_trail, &prospecting_desc);
+                }
 
                 ctx.db.crumb_trail_state().insert(new_trail);
             } else {

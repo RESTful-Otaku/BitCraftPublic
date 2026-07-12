@@ -29,6 +29,7 @@ pub mod admin_onboarding_reducers;
 pub mod admin_patch_housing_costs;
 pub mod admin_quests;
 pub mod admin_region_moderation_config;
+pub mod admin_remove_collectible;
 pub mod admin_rename_building;
 pub mod admin_rename_claim;
 pub mod admin_rename_deployable;

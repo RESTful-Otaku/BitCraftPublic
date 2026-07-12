@@ -29,6 +29,27 @@ impl VaultState {
         return self.collectibles.iter().any(|c| c.id == id);
     }
 
+    pub fn remove_collectible_quantity(&mut self, collectible_id: i32, quantity: u32) -> u32 {
+        if quantity == 0 {
+            return 0;
+        }
+
+        let Some(index) = self.collectibles.iter().position(|c| c.id == collectible_id) else {
+            return 0;
+        };
+
+        let owned = self.collectibles[index].count.max(0) as u32;
+        let removed = owned.min(quantity);
+
+        if removed == owned {
+            self.collectibles.remove(index);
+        } else {
+            self.collectibles[index].count -= removed as i32;
+        }
+
+        removed
+    }
+
     pub fn add_collectible(&mut self, ctx: &ReducerContext, collectible_id: i32, add_if_locked: bool) -> Result<(), String> {
         if let Some(collectible_desc) = ctx.db.collectible_desc().id().find(&collectible_id) {
             let mut exists = false;

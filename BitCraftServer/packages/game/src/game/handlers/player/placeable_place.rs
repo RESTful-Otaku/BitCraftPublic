@@ -16,7 +16,7 @@ use crate::{
     messages::{
         action_request::PlayerPlaceablePlaceRequest,
         components::*,
-        game_util::{ItemStack, ItemType, LevelRequirement},
+        game_util::{ItemType, LevelRequirement},
         static_data::*,
     },
     unwrap_or_err, InventoryState,

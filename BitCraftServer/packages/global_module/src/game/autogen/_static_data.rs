@@ -41,6 +41,9 @@ pub fn clear_staged_static_data(ctx: &ReducerContext) -> Result<(), String> {
     for r in ctx.db.staged_building_desc().iter() {
         ctx.db.staged_building_desc().delete(r);
     }
+    for r in ctx.db.staged_building_map_icon_desc().iter() {
+        ctx.db.staged_building_map_icon_desc().delete(r);
+    }
     for r in ctx.db.staged_building_portal_desc().iter() {
         ctx.db.staged_building_portal_desc().delete(r);
     }
@@ -460,6 +463,20 @@ pub fn stage_building_desc(ctx: &ReducerContext, records: Vec<BuildingDesc>) -> 
     }
     for r in records {
         if let Err(e) = ctx.db.staged_building_desc().try_insert(r.clone()) {
+            spacetimedb::log::error!("Failed to stage record {:?}: {}", r, e);
+            return Err(e.to_string());
+        }
+    }
+    Ok(())
+}
+
+#[spacetimedb::reducer]
+pub fn stage_building_map_icon_desc(ctx: &ReducerContext, records: Vec<BuildingMapIconDesc>) -> Result<(), String> {
+    if !has_role(ctx, &ctx.sender, Role::Admin) {
+        return Err("Invalid permissions".into());
+    }
+    for r in records {
+        if let Err(e) = ctx.db.staged_building_map_icon_desc().try_insert(r.clone()) {
             spacetimedb::log::error!("Failed to stage record {:?}: {}", r, e);
             return Err(e.to_string());
         }
@@ -1813,6 +1830,9 @@ pub fn validate_staged_data(ctx: &ReducerContext) -> Result<(), String> {
     }
     if ctx.db.staged_building_desc().count() == 0 {
         return Err("Staged data for BuildingDesc is empty, aborting.".into());
+    }
+    if ctx.db.staged_building_map_icon_desc().count() == 0 {
+        return Err("Staged data for BuildingMapIconDesc is empty, aborting.".into());
     }
     if ctx.db.staged_building_portal_desc().count() == 0 {
         return Err("Staged data for BuildingPortalDesc is empty, aborting.".into());
