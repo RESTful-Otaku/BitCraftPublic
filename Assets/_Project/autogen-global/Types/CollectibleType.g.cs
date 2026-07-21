@@ -35,5 +35,7 @@ namespace BitCraft.Global
         HousingWalls,
         HousingFloor,
         DeployableAppearanceOverride,
+        FaceAccessory,
+        FacialHair,
     }
 }
