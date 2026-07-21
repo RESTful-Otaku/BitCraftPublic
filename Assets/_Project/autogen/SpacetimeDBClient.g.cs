@@ -52,9 +52,11 @@ namespace BitCraft.Spacetime
             AddTable(BuildingClaimDesc = new(conn));
             AddTable(BuildingDesc = new(conn));
             AddTable(BuildingFunctionTypeMappingDesc = new(conn));
+            AddTable(BuildingMapIconDesc = new(conn));
             AddTable(BuildingNicknameState = new(conn));
             AddTable(BuildingPortalDesc = new(conn));
             AddTable(BuildingRepairsDesc = new(conn));
+            AddTable(BuildingSpawnDesc = new(conn));
             AddTable(BuildingState = new(conn));
             AddTable(BuildingTypeDesc = new(conn));
             AddTable(BuyOrderState = new(conn));
@@ -62,6 +64,7 @@ namespace BitCraft.Spacetime
             AddTable(CharacterStatDesc = new(conn));
             AddTable(CharacterStatsState = new(conn));
             AddTable(ChatMessageState = new(conn));
+            AddTable(ChestRarityDesc = new(conn));
             AddTable(ClaimLocalState = new(conn));
             AddTable(ClaimLocalSupplySecurityThresholdState = new(conn));
             AddTable(ClaimLowercaseNameState = new(conn));
@@ -181,6 +184,7 @@ namespace BitCraft.Spacetime
             AddTable(KnowledgeResourceState = new(conn));
             AddTable(KnowledgeRuinsState = new(conn));
             AddTable(KnowledgeScrollDesc = new(conn));
+            AddTable(KnowledgeScrollTypeDesc = new(conn));
             AddTable(KnowledgeSecondaryState = new(conn));
             AddTable(KnowledgeStatModifierDesc = new(conn));
             AddTable(KnowledgeVaultState = new(conn));
@@ -188,6 +192,7 @@ namespace BitCraft.Spacetime
             AddTable(LocationState = new(conn));
             AddTable(LootChestDesc = new(conn));
             AddTable(LootChestState = new(conn));
+            AddTable(LootRarityDesc = new(conn));
             AddTable(LootTableDesc = new(conn));
             AddTable(LostItemsState = new(conn));
             AddTable(MarketplaceState = new(conn));
@@ -196,6 +201,7 @@ namespace BitCraft.Spacetime
             AddTable(NpcDesc = new(conn));
             AddTable(NpcState = new(conn));
             AddTable(OnDurabilityZeroTimer = new(conn));
+            AddTable(OnboardingRewardDesc = new(conn));
             AddTable(OnboardingState = new(conn));
             AddTable(ParametersDesc = new(conn));
             AddTable(PassiveCraftState = new(conn));
@@ -252,6 +258,7 @@ namespace BitCraft.Spacetime
             AddTable(ReservedNameDesc = new(conn));
             AddTable(ResourceClumpDesc = new(conn));
             AddTable(ResourceDesc = new(conn));
+            AddTable(ResourceGrowthRecipeDesc = new(conn));
             AddTable(ResourceHealthState = new(conn));
             AddTable(ResourcePlacementRecipeDesc = new(conn));
             AddTable(ResourceState = new(conn));
@@ -260,6 +267,7 @@ namespace BitCraft.Spacetime
             AddTable(SellOrderState = new(conn));
             AddTable(SignedInPlayerState = new(conn));
             AddTable(SkillDesc = new(conn));
+            AddTable(StageRewardsDesc = new(conn));
             AddTable(StaminaState = new(conn));
             AddTable(StorageLogState = new(conn));
             AddTable(TargetState = new(conn));
@@ -812,9 +820,11 @@ namespace BitCraft.Spacetime
             new QueryBuilder().From.BuildingClaimDesc().ToSql(),
             new QueryBuilder().From.BuildingDesc().ToSql(),
             new QueryBuilder().From.BuildingFunctionTypeMappingDesc().ToSql(),
+            new QueryBuilder().From.BuildingMapIconDesc().ToSql(),
             new QueryBuilder().From.BuildingNicknameState().ToSql(),
             new QueryBuilder().From.BuildingPortalDesc().ToSql(),
             new QueryBuilder().From.BuildingRepairsDesc().ToSql(),
+            new QueryBuilder().From.BuildingSpawnDesc().ToSql(),
             new QueryBuilder().From.BuildingState().ToSql(),
             new QueryBuilder().From.BuildingTypeDesc().ToSql(),
             new QueryBuilder().From.BuyOrderState().ToSql(),
@@ -822,6 +832,7 @@ namespace BitCraft.Spacetime
             new QueryBuilder().From.CharacterStatDesc().ToSql(),
             new QueryBuilder().From.CharacterStatsState().ToSql(),
             new QueryBuilder().From.ChatMessageState().ToSql(),
+            new QueryBuilder().From.ChestRarityDesc().ToSql(),
             new QueryBuilder().From.ClaimLocalState().ToSql(),
             new QueryBuilder().From.ClaimLocalSupplySecurityThresholdState().ToSql(),
             new QueryBuilder().From.ClaimLowercaseNameState().ToSql(),
@@ -941,6 +952,7 @@ namespace BitCraft.Spacetime
             new QueryBuilder().From.KnowledgeResourceState().ToSql(),
             new QueryBuilder().From.KnowledgeRuinsState().ToSql(),
             new QueryBuilder().From.KnowledgeScrollDesc().ToSql(),
+            new QueryBuilder().From.KnowledgeScrollTypeDesc().ToSql(),
             new QueryBuilder().From.KnowledgeSecondaryState().ToSql(),
             new QueryBuilder().From.KnowledgeStatModifierDesc().ToSql(),
             new QueryBuilder().From.KnowledgeVaultState().ToSql(),
@@ -948,6 +960,7 @@ namespace BitCraft.Spacetime
             new QueryBuilder().From.LocationState().ToSql(),
             new QueryBuilder().From.LootChestDesc().ToSql(),
             new QueryBuilder().From.LootChestState().ToSql(),
+            new QueryBuilder().From.LootRarityDesc().ToSql(),
             new QueryBuilder().From.LootTableDesc().ToSql(),
             new QueryBuilder().From.LostItemsState().ToSql(),
             new QueryBuilder().From.MarketplaceState().ToSql(),
@@ -956,6 +969,7 @@ namespace BitCraft.Spacetime
             new QueryBuilder().From.NpcDesc().ToSql(),
             new QueryBuilder().From.NpcState().ToSql(),
             new QueryBuilder().From.OnDurabilityZeroTimer().ToSql(),
+            new QueryBuilder().From.OnboardingRewardDesc().ToSql(),
             new QueryBuilder().From.OnboardingState().ToSql(),
             new QueryBuilder().From.ParametersDesc().ToSql(),
             new QueryBuilder().From.PassiveCraftState().ToSql(),
@@ -1012,6 +1026,7 @@ namespace BitCraft.Spacetime
             new QueryBuilder().From.ReservedNameDesc().ToSql(),
             new QueryBuilder().From.ResourceClumpDesc().ToSql(),
             new QueryBuilder().From.ResourceDesc().ToSql(),
+            new QueryBuilder().From.ResourceGrowthRecipeDesc().ToSql(),
             new QueryBuilder().From.ResourceHealthState().ToSql(),
             new QueryBuilder().From.ResourcePlacementRecipeDesc().ToSql(),
             new QueryBuilder().From.ResourceState().ToSql(),
@@ -1020,6 +1035,7 @@ namespace BitCraft.Spacetime
             new QueryBuilder().From.SellOrderState().ToSql(),
             new QueryBuilder().From.SignedInPlayerState().ToSql(),
             new QueryBuilder().From.SkillDesc().ToSql(),
+            new QueryBuilder().From.StageRewardsDesc().ToSql(),
             new QueryBuilder().From.StaminaState().ToSql(),
             new QueryBuilder().From.StorageLogState().ToSql(),
             new QueryBuilder().From.TargetState().ToSql(),
@@ -1082,9 +1098,11 @@ namespace BitCraft.Spacetime
         public global::SpacetimeDB.Table<BuildingClaimDesc, BuildingClaimDescCols, BuildingClaimDescIxCols> BuildingClaimDesc() => new("building_claim_desc", new BuildingClaimDescCols("building_claim_desc"), new BuildingClaimDescIxCols("building_claim_desc"));
         public global::SpacetimeDB.Table<BuildingDesc, BuildingDescCols, BuildingDescIxCols> BuildingDesc() => new("building_desc", new BuildingDescCols("building_desc"), new BuildingDescIxCols("building_desc"));
         public global::SpacetimeDB.Table<BuildingFunctionTypeMappingDesc, BuildingFunctionTypeMappingDescCols, BuildingFunctionTypeMappingDescIxCols> BuildingFunctionTypeMappingDesc() => new("building_function_type_mapping_desc", new BuildingFunctionTypeMappingDescCols("building_function_type_mapping_desc"), new BuildingFunctionTypeMappingDescIxCols("building_function_type_mapping_desc"));
+        public global::SpacetimeDB.Table<BuildingMapIconDesc, BuildingMapIconDescCols, BuildingMapIconDescIxCols> BuildingMapIconDesc() => new("building_map_icon_desc", new BuildingMapIconDescCols("building_map_icon_desc"), new BuildingMapIconDescIxCols("building_map_icon_desc"));
         public global::SpacetimeDB.Table<BuildingNicknameState, BuildingNicknameStateCols, BuildingNicknameStateIxCols> BuildingNicknameState() => new("building_nickname_state", new BuildingNicknameStateCols("building_nickname_state"), new BuildingNicknameStateIxCols("building_nickname_state"));
         public global::SpacetimeDB.Table<BuildingPortalDesc, BuildingPortalDescCols, BuildingPortalDescIxCols> BuildingPortalDesc() => new("building_portal_desc", new BuildingPortalDescCols("building_portal_desc"), new BuildingPortalDescIxCols("building_portal_desc"));
         public global::SpacetimeDB.Table<BuildingRepairsDesc, BuildingRepairsDescCols, BuildingRepairsDescIxCols> BuildingRepairsDesc() => new("building_repairs_desc", new BuildingRepairsDescCols("building_repairs_desc"), new BuildingRepairsDescIxCols("building_repairs_desc"));
+        public global::SpacetimeDB.Table<BuildingSpawnDesc, BuildingSpawnDescCols, BuildingSpawnDescIxCols> BuildingSpawnDesc() => new("building_spawn_desc", new BuildingSpawnDescCols("building_spawn_desc"), new BuildingSpawnDescIxCols("building_spawn_desc"));
         public global::SpacetimeDB.Table<BuildingState, BuildingStateCols, BuildingStateIxCols> BuildingState() => new("building_state", new BuildingStateCols("building_state"), new BuildingStateIxCols("building_state"));
         public global::SpacetimeDB.Table<BuildingTypeDesc, BuildingTypeDescCols, BuildingTypeDescIxCols> BuildingTypeDesc() => new("building_type_desc", new BuildingTypeDescCols("building_type_desc"), new BuildingTypeDescIxCols("building_type_desc"));
         public global::SpacetimeDB.Table<AuctionListingState, BuyOrderStateCols, BuyOrderStateIxCols> BuyOrderState() => new("buy_order_state", new BuyOrderStateCols("buy_order_state"), new BuyOrderStateIxCols("buy_order_state"));
@@ -1092,6 +1110,7 @@ namespace BitCraft.Spacetime
         public global::SpacetimeDB.Table<CharacterStatDesc, CharacterStatDescCols, CharacterStatDescIxCols> CharacterStatDesc() => new("character_stat_desc", new CharacterStatDescCols("character_stat_desc"), new CharacterStatDescIxCols("character_stat_desc"));
         public global::SpacetimeDB.Table<CharacterStatsState, CharacterStatsStateCols, CharacterStatsStateIxCols> CharacterStatsState() => new("character_stats_state", new CharacterStatsStateCols("character_stats_state"), new CharacterStatsStateIxCols("character_stats_state"));
         public global::SpacetimeDB.Table<ChatMessageState, ChatMessageStateCols, ChatMessageStateIxCols> ChatMessageState() => new("chat_message_state", new ChatMessageStateCols("chat_message_state"), new ChatMessageStateIxCols("chat_message_state"));
+        public global::SpacetimeDB.Table<ChestRarityDesc, ChestRarityDescCols, ChestRarityDescIxCols> ChestRarityDesc() => new("chest_rarity_desc", new ChestRarityDescCols("chest_rarity_desc"), new ChestRarityDescIxCols("chest_rarity_desc"));
         public global::SpacetimeDB.Table<ClaimLocalState, ClaimLocalStateCols, ClaimLocalStateIxCols> ClaimLocalState() => new("claim_local_state", new ClaimLocalStateCols("claim_local_state"), new ClaimLocalStateIxCols("claim_local_state"));
         public global::SpacetimeDB.Table<ClaimLocalSupplySecurityThresholdState, ClaimLocalSupplySecurityThresholdStateCols, ClaimLocalSupplySecurityThresholdStateIxCols> ClaimLocalSupplySecurityThresholdState() => new("claim_local_supply_security_threshold_state", new ClaimLocalSupplySecurityThresholdStateCols("claim_local_supply_security_threshold_state"), new ClaimLocalSupplySecurityThresholdStateIxCols("claim_local_supply_security_threshold_state"));
         public global::SpacetimeDB.Table<ClaimLowercaseNameState, ClaimLowercaseNameStateCols, ClaimLowercaseNameStateIxCols> ClaimLowercaseNameState() => new("claim_lowercase_name_state", new ClaimLowercaseNameStateCols("claim_lowercase_name_state"), new ClaimLowercaseNameStateIxCols("claim_lowercase_name_state"));
@@ -1211,6 +1230,7 @@ namespace BitCraft.Spacetime
         public global::SpacetimeDB.Table<KnowledgeResourceState, KnowledgeResourceStateCols, KnowledgeResourceStateIxCols> KnowledgeResourceState() => new("knowledge_resource_state", new KnowledgeResourceStateCols("knowledge_resource_state"), new KnowledgeResourceStateIxCols("knowledge_resource_state"));
         public global::SpacetimeDB.Table<KnowledgeRuinsState, KnowledgeRuinsStateCols, KnowledgeRuinsStateIxCols> KnowledgeRuinsState() => new("knowledge_ruins_state", new KnowledgeRuinsStateCols("knowledge_ruins_state"), new KnowledgeRuinsStateIxCols("knowledge_ruins_state"));
         public global::SpacetimeDB.Table<KnowledgeScrollDesc, KnowledgeScrollDescCols, KnowledgeScrollDescIxCols> KnowledgeScrollDesc() => new("knowledge_scroll_desc", new KnowledgeScrollDescCols("knowledge_scroll_desc"), new KnowledgeScrollDescIxCols("knowledge_scroll_desc"));
+        public global::SpacetimeDB.Table<KnowledgeScrollTypeDesc, KnowledgeScrollTypeDescCols, KnowledgeScrollTypeDescIxCols> KnowledgeScrollTypeDesc() => new("knowledge_scroll_type_desc", new KnowledgeScrollTypeDescCols("knowledge_scroll_type_desc"), new KnowledgeScrollTypeDescIxCols("knowledge_scroll_type_desc"));
         public global::SpacetimeDB.Table<KnowledgeSecondaryState, KnowledgeSecondaryStateCols, KnowledgeSecondaryStateIxCols> KnowledgeSecondaryState() => new("knowledge_secondary_state", new KnowledgeSecondaryStateCols("knowledge_secondary_state"), new KnowledgeSecondaryStateIxCols("knowledge_secondary_state"));
         public global::SpacetimeDB.Table<KnowledgeStatModifierDesc, KnowledgeStatModifierDescCols, KnowledgeStatModifierDescIxCols> KnowledgeStatModifierDesc() => new("knowledge_stat_modifier_desc", new KnowledgeStatModifierDescCols("knowledge_stat_modifier_desc"), new KnowledgeStatModifierDescIxCols("knowledge_stat_modifier_desc"));
         public global::SpacetimeDB.Table<KnowledgeVaultState, KnowledgeVaultStateCols, KnowledgeVaultStateIxCols> KnowledgeVaultState() => new("knowledge_vault_state", new KnowledgeVaultStateCols("knowledge_vault_state"), new KnowledgeVaultStateIxCols("knowledge_vault_state"));
@@ -1218,6 +1238,7 @@ namespace BitCraft.Spacetime
         public global::SpacetimeDB.Table<LocationState, LocationStateCols, LocationStateIxCols> LocationState() => new("location_state", new LocationStateCols("location_state"), new LocationStateIxCols("location_state"));
         public global::SpacetimeDB.Table<LootChestDesc, LootChestDescCols, LootChestDescIxCols> LootChestDesc() => new("loot_chest_desc", new LootChestDescCols("loot_chest_desc"), new LootChestDescIxCols("loot_chest_desc"));
         public global::SpacetimeDB.Table<LootChestState, LootChestStateCols, LootChestStateIxCols> LootChestState() => new("loot_chest_state", new LootChestStateCols("loot_chest_state"), new LootChestStateIxCols("loot_chest_state"));
+        public global::SpacetimeDB.Table<LootRarityDesc, LootRarityDescCols, LootRarityDescIxCols> LootRarityDesc() => new("loot_rarity_desc", new LootRarityDescCols("loot_rarity_desc"), new LootRarityDescIxCols("loot_rarity_desc"));
         public global::SpacetimeDB.Table<LootTableDesc, LootTableDescCols, LootTableDescIxCols> LootTableDesc() => new("loot_table_desc", new LootTableDescCols("loot_table_desc"), new LootTableDescIxCols("loot_table_desc"));
         public global::SpacetimeDB.Table<LostItemsState, LostItemsStateCols, LostItemsStateIxCols> LostItemsState() => new("lost_items_state", new LostItemsStateCols("lost_items_state"), new LostItemsStateIxCols("lost_items_state"));
         public global::SpacetimeDB.Table<MarketplaceState, MarketplaceStateCols, MarketplaceStateIxCols> MarketplaceState() => new("marketplace_state", new MarketplaceStateCols("marketplace_state"), new MarketplaceStateIxCols("marketplace_state"));
@@ -1226,6 +1247,7 @@ namespace BitCraft.Spacetime
         public global::SpacetimeDB.Table<NpcDesc, NpcDescCols, NpcDescIxCols> NpcDesc() => new("npc_desc", new NpcDescCols("npc_desc"), new NpcDescIxCols("npc_desc"));
         public global::SpacetimeDB.Table<NpcState, NpcStateCols, NpcStateIxCols> NpcState() => new("npc_state", new NpcStateCols("npc_state"), new NpcStateIxCols("npc_state"));
         public global::SpacetimeDB.Table<OnDurabilityZeroTimer, OnDurabilityZeroTimerCols, OnDurabilityZeroTimerIxCols> OnDurabilityZeroTimer() => new("on_durability_zero_timer", new OnDurabilityZeroTimerCols("on_durability_zero_timer"), new OnDurabilityZeroTimerIxCols("on_durability_zero_timer"));
+        public global::SpacetimeDB.Table<OnboardingRewardDesc, OnboardingRewardDescCols, OnboardingRewardDescIxCols> OnboardingRewardDesc() => new("onboarding_reward_desc", new OnboardingRewardDescCols("onboarding_reward_desc"), new OnboardingRewardDescIxCols("onboarding_reward_desc"));
         public global::SpacetimeDB.Table<OnboardingState, OnboardingStateCols, OnboardingStateIxCols> OnboardingState() => new("onboarding_state", new OnboardingStateCols("onboarding_state"), new OnboardingStateIxCols("onboarding_state"));
         public global::SpacetimeDB.Table<ParametersDesc, ParametersDescCols, ParametersDescIxCols> ParametersDesc() => new("parameters_desc", new ParametersDescCols("parameters_desc"), new ParametersDescIxCols("parameters_desc"));
         public global::SpacetimeDB.Table<PassiveCraftState, PassiveCraftStateCols, PassiveCraftStateIxCols> PassiveCraftState() => new("passive_craft_state", new PassiveCraftStateCols("passive_craft_state"), new PassiveCraftStateIxCols("passive_craft_state"));
@@ -1282,6 +1304,7 @@ namespace BitCraft.Spacetime
         public global::SpacetimeDB.Table<ReservedNameDesc, ReservedNameDescCols, ReservedNameDescIxCols> ReservedNameDesc() => new("reserved_name_desc", new ReservedNameDescCols("reserved_name_desc"), new ReservedNameDescIxCols("reserved_name_desc"));
         public global::SpacetimeDB.Table<ResourceClumpDesc, ResourceClumpDescCols, ResourceClumpDescIxCols> ResourceClumpDesc() => new("resource_clump_desc", new ResourceClumpDescCols("resource_clump_desc"), new ResourceClumpDescIxCols("resource_clump_desc"));
         public global::SpacetimeDB.Table<ResourceDesc, ResourceDescCols, ResourceDescIxCols> ResourceDesc() => new("resource_desc", new ResourceDescCols("resource_desc"), new ResourceDescIxCols("resource_desc"));
+        public global::SpacetimeDB.Table<ResourceGrowthRecipeDesc, ResourceGrowthRecipeDescCols, ResourceGrowthRecipeDescIxCols> ResourceGrowthRecipeDesc() => new("resource_growth_recipe_desc", new ResourceGrowthRecipeDescCols("resource_growth_recipe_desc"), new ResourceGrowthRecipeDescIxCols("resource_growth_recipe_desc"));
         public global::SpacetimeDB.Table<ResourceHealthState, ResourceHealthStateCols, ResourceHealthStateIxCols> ResourceHealthState() => new("resource_health_state", new ResourceHealthStateCols("resource_health_state"), new ResourceHealthStateIxCols("resource_health_state"));
         public global::SpacetimeDB.Table<ResourcePlacementRecipeDesc, ResourcePlacementRecipeDescCols, ResourcePlacementRecipeDescIxCols> ResourcePlacementRecipeDesc() => new("resource_placement_recipe_desc", new ResourcePlacementRecipeDescCols("resource_placement_recipe_desc"), new ResourcePlacementRecipeDescIxCols("resource_placement_recipe_desc"));
         public global::SpacetimeDB.Table<ResourceState, ResourceStateCols, ResourceStateIxCols> ResourceState() => new("resource_state", new ResourceStateCols("resource_state"), new ResourceStateIxCols("resource_state"));
@@ -1290,6 +1313,7 @@ namespace BitCraft.Spacetime
         public global::SpacetimeDB.Table<AuctionListingState, SellOrderStateCols, SellOrderStateIxCols> SellOrderState() => new("sell_order_state", new SellOrderStateCols("sell_order_state"), new SellOrderStateIxCols("sell_order_state"));
         public global::SpacetimeDB.Table<SignedInPlayerState, SignedInPlayerStateCols, SignedInPlayerStateIxCols> SignedInPlayerState() => new("signed_in_player_state", new SignedInPlayerStateCols("signed_in_player_state"), new SignedInPlayerStateIxCols("signed_in_player_state"));
         public global::SpacetimeDB.Table<SkillDesc, SkillDescCols, SkillDescIxCols> SkillDesc() => new("skill_desc", new SkillDescCols("skill_desc"), new SkillDescIxCols("skill_desc"));
+        public global::SpacetimeDB.Table<StageRewardsDesc, StageRewardsDescCols, StageRewardsDescIxCols> StageRewardsDesc() => new("stage_rewards_desc", new StageRewardsDescCols("stage_rewards_desc"), new StageRewardsDescIxCols("stage_rewards_desc"));
         public global::SpacetimeDB.Table<StaminaState, StaminaStateCols, StaminaStateIxCols> StaminaState() => new("stamina_state", new StaminaStateCols("stamina_state"), new StaminaStateIxCols("stamina_state"));
         public global::SpacetimeDB.Table<ActionLogState, StorageLogStateCols, StorageLogStateIxCols> StorageLogState() => new("storage_log_state", new StorageLogStateCols("storage_log_state"), new StorageLogStateIxCols("storage_log_state"));
         public global::SpacetimeDB.Table<TargetState, TargetStateCols, TargetStateIxCols> TargetState() => new("target_state", new TargetStateCols("target_state"), new TargetStateIxCols("target_state"));
@@ -1453,6 +1477,7 @@ namespace BitCraft.Spacetime
                 Reducer.AdminMigrateTradeOrders args => Reducers.InvokeAdminMigrateTradeOrders(eventContext, args),
                 Reducer.AdminModifyChatMessage args => Reducers.InvokeAdminModifyChatMessage(eventContext, args),
                 Reducer.AdminPatchHousingCosts args => Reducers.InvokeAdminPatchHousingCosts(eventContext, args),
+                Reducer.AdminRemoveCollectible args => Reducers.InvokeAdminRemoveCollectible(eventContext, args),
                 Reducer.AdminRenameBuilding args => Reducers.InvokeAdminRenameBuilding(eventContext, args),
                 Reducer.AdminRenameBuildingCoord args => Reducers.InvokeAdminRenameBuildingCoord(eventContext, args),
                 Reducer.AdminRenameBuildingEntity args => Reducers.InvokeAdminRenameBuildingEntity(eventContext, args),
@@ -1673,6 +1698,7 @@ namespace BitCraft.Spacetime
                 Reducer.ImportBuildingBuffDesc args => Reducers.InvokeImportBuildingBuffDesc(eventContext, args),
                 Reducer.ImportBuildingClaimDesc args => Reducers.InvokeImportBuildingClaimDesc(eventContext, args),
                 Reducer.ImportBuildingDesc args => Reducers.InvokeImportBuildingDesc(eventContext, args),
+                Reducer.ImportBuildingMapIconDesc args => Reducers.InvokeImportBuildingMapIconDesc(eventContext, args),
                 Reducer.ImportBuildingPortalDesc args => Reducers.InvokeImportBuildingPortalDesc(eventContext, args),
                 Reducer.ImportBuildingRepairsDesc args => Reducers.InvokeImportBuildingRepairsDesc(eventContext, args),
                 Reducer.ImportBuildingSpawnDesc args => Reducers.InvokeImportBuildingSpawnDesc(eventContext, args),
@@ -1971,6 +1997,7 @@ namespace BitCraft.Spacetime
                 Reducer.StageBuildingBuffDesc args => Reducers.InvokeStageBuildingBuffDesc(eventContext, args),
                 Reducer.StageBuildingClaimDesc args => Reducers.InvokeStageBuildingClaimDesc(eventContext, args),
                 Reducer.StageBuildingDesc args => Reducers.InvokeStageBuildingDesc(eventContext, args),
+                Reducer.StageBuildingMapIconDesc args => Reducers.InvokeStageBuildingMapIconDesc(eventContext, args),
                 Reducer.StageBuildingPortalDesc args => Reducers.InvokeStageBuildingPortalDesc(eventContext, args),
                 Reducer.StageBuildingRepairsDesc args => Reducers.InvokeStageBuildingRepairsDesc(eventContext, args),
                 Reducer.StageBuildingSpawnDesc args => Reducers.InvokeStageBuildingSpawnDesc(eventContext, args),

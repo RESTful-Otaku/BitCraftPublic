@@ -35,5 +35,7 @@ namespace BitCraft.Spacetime
         HousingWalls,
         HousingFloor,
         DeployableAppearanceOverride,
+        FaceAccessory,
+        FacialHair,
     }
 }
