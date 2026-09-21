@@ -880,7 +880,7 @@ fn base_checks(
                 .as_secs();
 
             return Err(format!(
-                "You have to wait {delta} {} before attacking this enemy",
+                "You have to wait {{0}} {{1}} before attacking this enemy|~{delta}|~{}",
                 if delta > 1 { "seconds" } else { "second" }
             )
             .into());
@@ -983,7 +983,7 @@ fn base_checks(
                 };
             }
             if weapon_tier < enemy_desc.tier {
-                return Err(format!("You need a tier {} weapon to attack this type of enemy", enemy_desc.tier));
+                return Err(format!("You need a tier {{0}} weapon to attack this type of enemy|~{}", enemy_desc.tier));
             }
         }
 

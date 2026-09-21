@@ -12,6 +12,7 @@ use crate::{
             building_state, buy_order_state, closed_listing_state, sell_order_state, AuctionListingState, ClosedListingState, HealthState,
             InventoryState,
         },
+        events::{market_trade_event, MarketOrderType, MarketTradeEvent},
         game_util::{ItemStack, ItemType},
     },
     unwrap_or_err,
@@ -129,6 +130,20 @@ pub fn resolve_sell_order(
 
         matching_order.quantity -= quantity_sold;
         matching_order.stored_coins -= sale_coins_amount;
+
+        ctx.db.market_trade_event().insert(MarketTradeEvent {
+            claim_entity_id,
+            listing_entity_id: matching_order.entity_id,
+            listing_type: MarketOrderType::BuyOrder,
+            buyer_entity_id: matching_order.owner_entity_id,
+            seller_entity_id: owner_entity_id,
+            item_id: required_item.item_id,
+            item_type: required_item.item_type,
+            quantity: quantity_sold,
+            unit_price: matching_order.price_threshold,
+            listing_remaining_quantity: matching_order.quantity,
+            timestamp: ctx.timestamp,
+        });
 
         if matching_order.quantity > 0 {
             ctx.db.buy_order_state().entity_id().update(matching_order.clone());

@@ -421,7 +421,7 @@ fn create_building_interior_internal(
             collapse_timestamp: 0,
         };
         if let Err(error) = ctx.db.dimension_description_state().try_insert(dimension_desc) {
-            return Err(format!("Failed to insert dimension description: {}", error));
+            return Err(format!("Failed to insert dimension description: {{0}}|~{}", error));
         }
         dimension_map.insert(*interior_instance, dimension);
         let interior_instance_desc = ctx.db.interior_instance_desc().id().find(*interior_instance).unwrap();

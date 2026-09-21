@@ -93,7 +93,7 @@ impl PlayerState {
                     >= dimension_desc_start.dimension_position_large_z as i32 + dimension_desc_start.dimension_size_large_z as i32)
             {
                 return Err(format!(
-                    "Move origin outside of world bounds! Origin: ({} {})",
+                    "Move origin outside of world bounds! Origin: ({{0}} {{1}})|~{}|~{}",
                     start_coordinates.x, start_coordinates.z
                 ));
             }
@@ -106,7 +106,7 @@ impl PlayerState {
                 >= dimension_desc_target.dimension_position_large_z as i32 + dimension_desc_target.dimension_size_large_z as i32)
         {
             return Err(format!(
-                "Move origin target of world bounds! Target: ({} {})",
+                "Move origin target of world bounds! Target: ({{0}} {{1}})|~{}|~{}",
                 target_coordinates.x, target_coordinates.z
             ));
         }
@@ -412,6 +412,17 @@ impl PlayerState {
                         && combat_action.weapon_type_requirements.contains(&weapon_type.id)
                         && combat_action.auto_cast
                     {
+                        // Reuse retained abilities when swapping weapons, including while their cooldown is active.
+                        if ctx
+                            .db
+                            .ability_state()
+                            .owner_entity_id()
+                            .filter(actor_id)
+                            .any(|ability| ability.ability == AbilityType::CombatAction(combat_action.id))
+                        {
+                            continue;
+                        }
+
                         let _ = ctx.db.ability_state().try_insert(AbilityState {
                             entity_id: game_state::create_entity(ctx),
                             owner_entity_id: actor_id,

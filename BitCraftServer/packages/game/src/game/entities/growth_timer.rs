@@ -210,7 +210,7 @@ fn broadcast_growth(
             scheduled_id: 0,
             scheduled_at: ScheduleAt::Time(end_timestamp - duration),
             message: format!(
-                "The (res={}) in Region {} at (coord={},{}) is preparing to unlock in {}.",
+                "The (res={{0}}) in Region {{1}} at (coord={{2}},{{3}}) is preparing to unlock in {{4}}.|~{}|~{}|~{}|~{}|~{}",
                 growth.resource_id, region.region_index, location.z, location.x, description
             ),
         });

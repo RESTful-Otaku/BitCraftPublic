@@ -959,7 +959,7 @@ impl EmpireNodeSiegeState {
 impl EmpireNotificationState {
     pub fn coord_to_string(coord: SmallHexTile) -> String {
         let large_tile = coord.parent_large_tile().to_offset_coordinates();
-        format!("N:{}, E:{}", large_tile.z, large_tile.x)
+        format!("N:{{0}}, E:{{1}}|~{}|~{}", large_tile.z, large_tile.x)
     }
 
     pub fn new_with_nickname_and_coord(

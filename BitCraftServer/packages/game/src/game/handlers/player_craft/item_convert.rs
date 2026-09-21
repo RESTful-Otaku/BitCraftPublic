@@ -24,7 +24,7 @@ pub fn event_delay_recipe_id(ctx: &ReducerContext, request: &PlayerItemConvertRe
         None => return (Duration::ZERO, None),
     };
 
-    let time_cost = conversion_recipe.time_cost as f32;
+    let time_cost = conversion_recipe.time_cost as f32 * request.count.max(1) as f32;
     return (Duration::from_secs_f32(time_cost), Some(conversion_recipe.id));
 }
 
@@ -66,6 +66,11 @@ pub fn item_convert(ctx: &ReducerContext, request: PlayerItemConvertRequest) -> 
 }
 
 fn reduce(ctx: &ReducerContext, actor_id: u64, request: &PlayerItemConvertRequest, dry_run: bool) -> Result<(), String> {
+    let conversion_count = i32::try_from(request.count).map_err(|_| "Failed to convert items: count is too large.")?;
+    if conversion_count <= 0 {
+        return Err("Failed to convert items: count must be greater than zero.".into());
+    }
+
     HealthState::check_incapacitated(ctx, actor_id, true)?;
 
     if !dry_run {
@@ -90,7 +95,7 @@ fn reduce(ctx: &ReducerContext, actor_id: u64, request: &PlayerItemConvertReques
             _default => ItemConversionLocationContext::None,
         };
 
-        return Err(String::from(format!("Cannot perform item conversion, you must be in {:?}", location_context)).into());
+        return Err(String::from(format!("Cannot perform item conversion, you must be in {{0}}|~{:?}", location_context)).into());
     }
 
     let player_large_tile = game_state_filters::coordinates_any(ctx, actor_id).parent_large_tile();
@@ -119,12 +124,24 @@ fn reduce(ctx: &ReducerContext, actor_id: u64, request: &PlayerItemConvertReques
     // Check to see if we have all the ingredients for this item conversion
     let mut player_inventory = unwrap_or_err!(InventoryState::get_player_inventory(ctx, actor_id), "Player has no inventory");
 
-    if player_inventory.remove(&item_conversion_recipe.input_items) == false {
+    let input_items = item_conversion_recipe
+        .input_items
+        .iter()
+        .map(|item_stack| {
+            item_stack
+                .quantity
+                .checked_mul(conversion_count)
+                .map(|quantity| item_stack.clone_with_quantity(quantity))
+        })
+        .collect::<Option<Vec<_>>>()
+        .ok_or("Failed to convert items: required item count is too large.")?;
+
+    if player_inventory.remove(&input_items) == false {
         return Err("Failed to convert items: all ingredients were not found in inventory.".into());
     }
 
     // Apply stamin cost to the player
-    let stamina_cost = item_conversion_recipe.stamina_cost as f32;
+    let stamina_cost = item_conversion_recipe.stamina_cost as f32 * conversion_count as f32;
 
     let stamina_state = unwrap_or_err!(
         ctx.db.stamina_state().entity_id().find(&actor_id),
@@ -142,6 +159,10 @@ fn reduce(ctx: &ReducerContext, actor_id: u64, request: &PlayerItemConvertReques
 
     // Try to add the recipe outcome item to the player's inventory
     let mut output_item = unwrap_or_err!(item_conversion_recipe.output_item, "Invalid recipe output item!");
+    output_item.quantity = output_item
+        .quantity
+        .checked_mul(conversion_count)
+        .ok_or("Failed to convert items: output item count is too large.")?;
 
     if !dry_run {
         let mut discovery = Discovery::new(actor_id);

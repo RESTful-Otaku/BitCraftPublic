@@ -231,11 +231,11 @@ pub fn project_site_place(ctx: &ReducerContext, request: PlayerProjectSitePlaceR
     }
     if required_interior_tier > 0 {
         if dimension.interior_instance_id == 0 {
-            return Err(format!("Requires Tier {} interior", required_interior_tier).into());
+            return Err(format!("Requires Tier {{0}} interior|~{}", required_interior_tier).into());
         }
         let instance = ctx.db.interior_instance_desc().id().find(&dimension.interior_instance_id).unwrap();
         if instance.tier < required_interior_tier {
-            return Err(format!("Requires Tier {} interior", required_interior_tier).into());
+            return Err(format!("Requires Tier {{0}} interior|~{}", required_interior_tier).into());
         }
     }
 

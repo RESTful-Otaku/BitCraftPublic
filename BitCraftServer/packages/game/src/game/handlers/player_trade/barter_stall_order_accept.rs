@@ -15,6 +15,7 @@ use crate::{
     messages::{
         action_request::PlayerBarterStallOrderAccept,
         components::*,
+        events::BarterStallInventoryEvent,
         game_util::{ItemStack, ItemType},
     },
     unwrap_or_err,
@@ -128,7 +129,7 @@ pub fn reduce(ctx: &ReducerContext, entity_id: u64, shop_entity_id: u64, trade_o
                         ctx.db.achievement_desc().id().find(&achievement_id),
                         "Required achievement does not exist"
                     );
-                    return Err(format!("You must have completed achievement {} to do this trade", achievement.name).into());
+                    return Err(format!("You must have completed achievement {{0}} to do this trade|~{}", achievement.name).into());
                 }
             }
 
@@ -140,7 +141,7 @@ pub fn reduce(ctx: &ReducerContext, entity_id: u64, shop_entity_id: u64, trade_o
                         "Required skill does not exist."
                     );
                     return Err(format!(
-                        "You must have level {} or higher in {} to do this trade",
+                        "You must have level {{0}} or higher in {{1}} to do this trade|~{}|~{}",
                         level_requirements.level, skill.name
                     )
                     .into());
@@ -276,8 +277,13 @@ pub fn reduce(ctx: &ReducerContext, entity_id: u64, shop_entity_id: u64, trade_o
     // We assume barter stalls will only have 1 inventory. If in the future we have barter stalls with crafting inventory, we will need
     // to pass the inventory_index or make sure the first function is always the barter inventory.
     if let (Some(item_index), Some(cargo_index)) = (item_index, cargo_index) {
+        let mut stall_inventory_changes: Vec<(InventoryState, InventoryState)> = Vec::new();
+        let mut treasury_coins_added = 0;
+        let mut treasury_coins_removed = 0;
+
         if let Some(item_inventory) = InventoryState::get_by_owner_with_index(ctx, shop_entity_id, item_index as i32) {
             let mut item_inventory = item_inventory;
+            let item_inventory_before = item_inventory.clone();
 
             let mut removed_items = scale_item_stacks(
                 ctx,
@@ -329,6 +335,7 @@ pub fn reduce(ctx: &ReducerContext, entity_id: u64, shop_entity_id: u64, trade_o
                         }
                         // pay from the treasury
                         claim_local.treasury -= removed_from_treasury;
+                        treasury_coins_removed = removed_from_treasury as i32;
                         ctx.db.claim_local_state().entity_id().update(claim_local);
                     }
                 }
@@ -362,16 +369,19 @@ pub fn reduce(ctx: &ReducerContext, entity_id: u64, shop_entity_id: u64, trade_o
                     let mut claim_local = claim.as_ref().unwrap().local_state(ctx);
                     claim_local.treasury += gained_coins;
                     ctx.db.claim_local_state().entity_id().update(claim_local);
+                    treasury_coins_added = gained_coins as i32;
                 }
             }
 
             // Note / TODO: barter stalls should have a single inventory featuring both cargo and items.
 
+            stall_inventory_changes.push((item_inventory_before, item_inventory.clone()));
             ctx.db.inventory_state().entity_id().update(item_inventory);
         }
 
         if let Some(cargo_inventory) = InventoryState::get_by_owner_with_index(ctx, shop_entity_id, cargo_index as i32) {
             let mut cargo_inventory = cargo_inventory;
+            let cargo_inventory_before = cargo_inventory.clone();
 
             // Remove offered cargos
             let cargo_itemstacks = scale_item_stacks(
@@ -404,8 +414,20 @@ pub fn reduce(ctx: &ReducerContext, entity_id: u64, shop_entity_id: u64, trade_o
             if !cargo_inventory.add_multiple(ctx, &cargo_itemstacks) {
                 return Err("Building stockpile is full".into());
             }
+            stall_inventory_changes.push((cargo_inventory_before, cargo_inventory.clone()));
             ctx.db.inventory_state().entity_id().update(cargo_inventory);
         }
+
+        BarterStallInventoryEvent::emit_sale(
+            ctx,
+            entity_id,
+            shop_entity_id,
+            trade_order_entity_id,
+            amount,
+            stall_inventory_changes.iter().map(|(before, after)| (before, after)),
+            treasury_coins_added,
+            treasury_coins_removed,
+        );
     } else if ctx.db.npc_state().building_entity_id().filter(shop_entity_id).next().is_none() {
         return Err("The offered items are not available".into());
     }

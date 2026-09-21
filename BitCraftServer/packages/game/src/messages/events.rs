@@ -11,10 +11,11 @@ use crate::messages::action_request::{
 };
 use crate::messages::components::NotificationSeverity;
 use crate::messages::empire_shared::EmpireResupplyNodeRequest;
+use crate::messages::game_util::{ItemStack, ItemType};
 use crate::messages::static_data::EnemyType;
 use crate::messages::util::{OffsetCoordinatesFloat, SmallHexTileMessage};
 use bitcraft_macro::event_table;
-use spacetimedb::{Identity, SpacetimeType};
+use spacetimedb::{Identity, SpacetimeType, Timestamp};
 
 /// Ephemeral notifications for effects that must be visible to connections other
 /// than the reducer caller in SpacetimeDB 2.x.
@@ -233,6 +234,15 @@ pub struct ExtractEvent {
     pub is_crit: bool,
 }
 
+#[spacetimedb::table(accessor = craft_event, public, event)]
+#[derive(Clone)]
+pub struct CraftEvent {
+    pub actor_entity_id: u64,
+    pub target_entity_id: u64,
+    pub progress: i32,
+    pub is_crit: bool,
+}
+
 /// Signals that an extraction action depleted a resource and its client
 /// representation should be kept alive long enough to play its deplete effect.
 #[spacetimedb::table(accessor = resource_depleted_event, public, event)]
@@ -241,6 +251,18 @@ pub struct ResourceDepletedEvent {
     pub resource_entity_id: u64,
     pub location: SmallHexTileMessage,
     pub show_time_left: bool,
+}
+
+/// Signals that an active craft reached `actions_required * craft_count` and
+/// the player's Craft action was cleared. The pocket still exists until collect.
+#[spacetimedb::table(accessor = craft_completed_event, public, event)]
+#[derive(Clone)]
+pub struct CraftCompletedEvent {
+    pub actor_entity_id: u64,
+    pub progressive_action_entity_id: u64,
+    pub building_entity_id: u64,
+    pub recipe_id: i32,
+    pub craft_count: i32,
 }
 
 #[derive(SpacetimeType, Copy, Clone)]
@@ -285,6 +307,56 @@ pub struct DeployableMountEvent {
     pub deployable_entity_id: u64,
 }
 
+#[derive(SpacetimeType, Copy, Clone, Debug, PartialEq, Eq)]
+#[repr(i32)]
+pub enum MarketOrderType {
+    BuyOrder = 0,
+    SellOrder,
+}
+
+#[spacetimedb::table(accessor = market_trade_event, public, event)]
+pub struct MarketTradeEvent {
+    pub claim_entity_id: u64,
+    /// The existing buy_order_state / sell_order_state row that was filled
+    pub listing_entity_id: u64,
+    /// SellOrder: a player bought from the listing. BuyOrder: a player sold into the listing.
+    pub listing_type: MarketOrderType,
+    pub buyer_entity_id: u64,
+    pub seller_entity_id: u64,
+    pub item_id: i32,
+    pub item_type: ItemType,
+    pub quantity: i32,
+    pub unit_price: i32,
+    pub listing_remaining_quantity: i32,
+    pub timestamp: Timestamp,
+}
+
+#[derive(SpacetimeType, Copy, Clone, Debug, PartialEq, Eq)]
+#[repr(i32)]
+pub enum BarterStallInventoryChangeReason {
+    Sale = 0,
+}
+
+#[spacetimedb::table(accessor = barter_stall_inventory_event, public, event)]
+pub struct BarterStallInventoryEvent {
+    pub shop_entity_id: u64,
+    pub claim_entity_id: u64,
+    /// The player who accepted the trade order
+    pub actor_entity_id: u64,
+    pub reason: BarterStallInventoryChangeReason,
+    /// The accepted trade_order_state row
+    pub trade_order_entity_id: Option<u64>,
+    /// How many times the trade order was accepted
+    pub trade_amount: Option<i32>,
+    pub added_items: Vec<ItemStack>,
+    pub removed_items: Vec<ItemStack>,
+    /// Coins paid into the claim treasury instead of the stall inventory
+    pub treasury_coins_added: i32,
+    /// Coins paid out of the claim treasury because the stall inventory lacked them
+    pub treasury_coins_removed: i32,
+    pub timestamp: Timestamp,
+}
+
 #[event_table(name = player_notification_event)]
 pub struct PlayerNotificationEvent {
     pub player_entity_id: u64,
@@ -301,4 +373,29 @@ pub struct PlayerRegionTransferEvent {
 #[event_table(name = player_set_name_outcome_event)]
 pub struct PlayerSetNameOutcomeEvent {
     pub player_entity_id: u64,
+}
+
+#[derive(SpacetimeType, Copy, Clone)]
+#[repr(i32)]
+pub enum ClaimTreasuryChangeReason {
+    Deposit = 0,
+    Withdraw,
+}
+
+#[spacetimedb::table(accessor = claim_treasury_event, public, event)]
+pub struct ClaimTreasuryEvent {
+    pub claim_entity_id: u64,
+    pub actor_entity_id: u64,
+    pub reason: ClaimTreasuryChangeReason,
+    pub amount: u32,
+    pub treasury_after: u32,
+    pub timestamp: Timestamp,
+}
+
+#[spacetimedb::table(accessor = building_buff_activate_event, public, event)]
+pub struct BuildingBuffActivateEvent {
+    pub actor_entity_id: u64,
+    pub building_entity_id: u64,
+    pub empire_entity_id: u64,
+    pub amount: u32,
 }

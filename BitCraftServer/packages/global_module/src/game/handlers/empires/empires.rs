@@ -351,7 +351,7 @@ pub fn empire_set_player_rank(ctx: &ReducerContext, request: EmpireSetPlayerRank
             .count();
 
         if current_count + 1 > maximum_count as usize {
-            return Err(format!("Your empire is limited to {maximum_count} instances of that rank."));
+            return Err(format!("Your empire is limited to {{0}} instances of that rank.|~{maximum_count}"));
         }
     }
 

@@ -213,7 +213,7 @@ fn validate_move(
                 actor_id,
                 deployable_entity_id,
                 prev_origin,
-                format!("Player {actor_id} (vehicle {deployable_entity_id})"),
+                format!("Player {{0}} (vehicle {{1}})|~{actor_id}|~{deployable_entity_id}"),
                 error,
             );
         }

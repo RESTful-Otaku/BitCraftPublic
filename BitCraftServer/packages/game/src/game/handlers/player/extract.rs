@@ -61,7 +61,7 @@ fn format_missing_input_message(ctx: &ReducerContext, required_stack: &ItemStack
             .unwrap_or_else(|| "Unknown cargo".into()),
     };
 
-    format!("Requires {} {}", required_stack.quantity, item_name)
+    format!("Requires {{0}} {{1}}|~{}|~{}", required_stack.quantity, item_name)
 }
 
 fn event_delay_recipe_id(ctx: &ReducerContext, request: &PlayerExtractRequest, stats: &CharacterStatsState) -> (Duration, Option<i32>) {

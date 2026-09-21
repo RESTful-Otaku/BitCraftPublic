@@ -7,6 +7,7 @@ pub mod active_buff_state;
 pub mod alert_state;
 pub mod attack_outcome_state;
 pub mod auction_listing_state;
+pub mod barter_stall_inventory_event;
 pub mod buff;
 pub mod building_desc;
 pub mod building_function;

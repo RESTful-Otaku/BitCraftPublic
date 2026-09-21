@@ -156,7 +156,7 @@ fn reduce(ctx: &ReducerContext, actor_id: u64, request: PlayerPlaceablePlaceRequ
                     .unwrap_or_else(|| "Unknown cargo".into()),
             };
 
-            return Err(format!("Requires: {} x{}", item_name, recipe.input_item.quantity));
+            return Err(format!("Requires: {{0}} x{{1}}|~{}|~{}", item_name, recipe.input_item.quantity));
         }
 
         PlaceableState::spawn(ctx, placeable_desc.id, actor_id, coordinates, request.facing_direction)?;
@@ -245,7 +245,7 @@ fn validate_location_rules(
             if recipe.required_paving_tier == 0 {
                 return Err("This placeable requires paving!".into());
             }
-            return Err(format!("This placeable requires tier {} paving!", recipe.required_paving_tier));
+            return Err(format!("This placeable requires tier {{0}} paving!|~{}", recipe.required_paving_tier));
         }
     }
 
@@ -258,12 +258,12 @@ fn validate_location_rules(
     }
     if recipe.required_interior_tier > 0 {
         if dimension.interior_instance_id == 0 {
-            return Err(format!("Requires Tier {} interior", recipe.required_interior_tier));
+            return Err(format!("Requires Tier {{0}} interior|~{}", recipe.required_interior_tier));
         }
 
         let interior = ctx.db.interior_instance_desc().id().find(&dimension.interior_instance_id).unwrap();
         if interior.tier < recipe.required_interior_tier {
-            return Err(format!("Requires Tier {} interior", recipe.required_interior_tier));
+            return Err(format!("Requires Tier {{0}} interior|~{}", recipe.required_interior_tier));
         }
     }
 
@@ -277,7 +277,7 @@ fn validate_location_rules(
             "This claim is missing its tech tree"
         );
         if claim_tech.max_tier(ctx) < recipe.required_claim_tier {
-            return Err(format!("Requires Tier {} claim", recipe.required_claim_tier));
+            return Err(format!("Requires Tier {{0}} claim|~{}", recipe.required_claim_tier));
         }
     }
 
@@ -324,7 +324,7 @@ fn validate_group_rules(
 
         if owned_group_placeables.len() >= group.placement_limit as usize {
             if !request.replace_oldest_in_full_group {
-                return Err(format!("You can only place {} {}", group.placement_limit, group.name));
+                return Err(format!("You can only place {{0}} {{1}}|~{}|~{}", group.placement_limit, group.name));
             }
 
             if !dry_run {

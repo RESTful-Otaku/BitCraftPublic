@@ -92,7 +92,7 @@ pub fn reduce(
             let cutoff = game_state::unix(ctx.timestamp) - min_playtime;
             if player_state.sign_in_timestamp > cutoff {
                 let hours = min_playtime / 3600;
-                return Err(format!("Region chat is unlocked after {} hours for new accounts.", hours));
+                return Err(format!("Region chat is unlocked after {{0}} hours for new accounts.|~{}", hours));
             }
         }
         if username.starts_with("player") {
@@ -110,7 +110,7 @@ pub fn reduce(
             .count();
         if msg_count >= max_messages as usize {
             return Err(format!(
-                "You can only send {} messages per {} seconds in Region chat",
+                "You can only send {{0}} messages per {{1}} seconds in Region chat|~{}|~{}",
                 max_messages, rate_limit_window
             ));
         }
